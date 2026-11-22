@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>기록 항목 (로그)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<style>:root{--bg:#f6f7f9;--card:#fff;--line:#e3e6eb;--text:#1d2129;--sub:#5d6573;--accent:#2f5d8a;--th:#f0f2f5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1115;--card:#171a20;--line:#2a2f38;--text:#e8eaf0;--sub:#9aa2b1;--accent:#6fa8dc;--th:#1e222a}}
+:root[data-theme="dark"]{--bg:#0f1115;--card:#171a20;--line:#2a2f38;--text:#e8eaf0;--sub:#9aa2b1;--accent:#6fa8dc;--th:#1e222a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.75 "IBM Plex Sans KR",system-ui,"Malgun Gothic",sans-serif}
+a{color:var(--accent)}nav{border-bottom:1px solid var(--line);background:var(--card)}
+nav .in{max-width:880px;margin:0 auto;padding:10px 16px;display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14px}
+nav a{text-decoration:none;color:var(--sub)}nav a.on{color:var(--text);font-weight:700}nav .home{color:var(--accent);margin-right:6px}
+main{max-width:880px;margin:0 auto;padding:32px 16px 64px}
+h1{font-size:26px;line-height:1.35;margin:0 0 4px}h2{font-size:20px;margin:40px 0 10px;padding-top:8px;border-top:1px solid var(--line)}h3{font-size:17px;margin:28px 0 8px}
+h1+p{color:var(--sub);font-size:13px;margin-top:0}
+.tw{overflow-x:auto;margin:14px 0}table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.55;background:var(--card)}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}th{background:var(--th);white-space:nowrap}
+code{font-size:13px;background:var(--th);padding:1px 4px;border-radius:4px}
+.pn{display:flex;justify-content:space-between;gap:12px;margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:14px}
+.list a{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin-bottom:10px}
+.list a:hover{border-color:var(--accent)}.list b{font-size:16px}.list span{display:block;color:var(--sub);font-size:14px}</style>
+</head>
+<body>
+<nav><div class="in"><a class="home" href="../">← 처음으로</a><a href="./">작업 기록 목록</a><a href="ai.html">AI 역할 구분</a><a href="log.html" class="on">로그 기록 항목</a><a href="qa.html">QA 기록</a><a href="notes.html">프로토타입 메모</a></div></nav>
+<main>
+<h1>기록 항목 (로그)</h1>
+<p>판을 돌리면서 남기는 값과 대시보드에서 쓰는 곳. 지금 코드(<code>prototype/core</code>, <code>dashboard/sim.js</code>)가 실제로 남기는 것 기준. 처음엔 없다가 새로 더한 것은 4번에 따로 모음.</p>
+<p>기록은 두 겹.</p>
+<ul><li><strong>사건 기록</strong>: 판이 도는 동안 맞음, 적 처치, 카드 선택 같은 일이 생길 때마다 한 줄. 다시 보기와 판 요약의 재료</li><li><strong>판 요약</strong>: 판이 끝나면 사건 기록을 훑어서 한 줄로 줄인 것. 대시보드는 이 요약만 모아서 그래프를 그림</li></ul>
+<p>모든 사건에는 시각(초), 층, 웨이브가 같이 붙음.</p>
+<h2>1. 판이 끝나는 방식</h2>
+<div class="tw"><table><thead><tr><th>결과</th><th>언제</th><th>대시보드에서</th></tr></thead><tbody><tr><td>사망</td><td>체력이 0이 됨</td><td>실력별 결과 막대, 어디서 죽었나</td></tr><tr><td>클리어</td><td>5층을 깸(무한 모드 들어가기 전에 끝냄)</td><td>실력별 결과 막대</td></tr><tr><td>시간 초과</td><td>한 층(보스 포함) 전투 시간이 120초를 넘음</td><td>실력별 결과 막대, 튀는 판으로 바로 짚음</td></tr></tbody></table></div>
+<p>사망과 시간 초과는 따로 셈. 둘 다 못 깬 판이지만 원인이 반대(너무 약함 / 너무 오래 걸림)라, 합치면 조정 방향을 잘못 읽게 됨.</p>
+<h2>2. 판 요약 (판마다 한 줄)</h2>
+<div class="tw"><table><thead><tr><th>항목</th><th>남기는 값</th><th>왜 남기나</th><th>대시보드 어디에</th></tr></thead><tbody><tr><td>시드</td><td>숫자</td><td>같은 판을 그대로 다시 돌리려고</td><td>튀는 판을 누르면 그 시드로 다시 보기</td></tr><tr><td>봇 실력</td><td>숙련 / 중간 / 초보</td><td>실력별로 나눠 보려고</td><td>모든 차트의 실력 구분</td></tr><tr><td>판 결과</td><td>사망 / 클리어 / 시간 초과</td><td>1번 참고</td><td>실력별 결과 막대</td></tr><tr><td>끝난 곳</td><td>층, 웨이브</td><td>어디까지 버텼는지</td><td>평균 도달 층, 어디서 막히나</td></tr><tr><td>전투 시간</td><td>초</td><td>판 길이</td><td>평균 전투 시간, 실제 초당 피해 계산</td></tr><tr><td>받은 피해 합계</td><td>숫자</td><td>얼마나 맞았나</td><td>실력별 평균 받은 피해</td></tr><tr><td>준 피해 합계</td><td>숫자</td><td>실제 초당 피해 계산</td><td>실제로 때린 비율</td></tr><tr><td>웨이브별 기록</td><td>층, 웨이브, 걸린 시간, 받은 피해, 끝까지 깼는지</td><td>한 웨이브만 유독 오래 걸리거나 많이 맞은 판 짚기</td><td>어디서 막히나, 튀는 판, 보스 처치 시간 검사</td></tr><tr><td>웨이브 끝날 때 남은 체력</td><td>층, 웨이브, 체력</td><td>웨이브를 지나며 체력이 어떻게 줄어드는지</td><td>웨이브마다 남은 체력 선 그래프</td></tr><tr><td>어떤 공격에 맞았나</td><td>근거리형 / 원거리형 / 보스 휘두르기 / 보스 돌진별 받은 피해와 맞은 횟수</td><td>실력 차이가 어느 적에서 나는지</td><td>어떤 적에게 맞았나, 봇 실력 검사</td></tr><tr><td>한 방에 크게 맞은 피해</td><td>숫자</td><td>한 번에 큰 피해를 받은 판 짚기</td><td>튀는 판</td></tr><tr><td>누구한테 죽었나</td><td>마지막으로 맞은 공격 종류</td><td>죽은 원인</td><td>어디서 막히나</td></tr><tr><td>층마다 나온 맵</td><td>맵 목록</td><td>맵별 비교</td><td>맵이 늘어나면 상황별 비교</td></tr><tr><td>나온 공격 수</td><td>근거리형 / 휘두르기 / 돌진 공격이 나온 횟수</td><td>맞은 비율(맞은 횟수 ÷ 나온 공격 수) 계산</td><td>봇 실력 검사</td></tr><tr><td>대시 쿨 중 근거리형에게 맞은 횟수</td><td>숫자</td><td>대시 쿨타임이 근거리형 공격을 피하기에 충분한지</td><td>대시 쿨타임 검사</td></tr><tr><td>휘두른 횟수, 헛스윙 수</td><td>숫자</td><td>실제로 맞힌 비율</td><td>헛스윙 비율</td></tr><tr><td>돌진 알아차림 / 깎으러 붙음</td><td>층별 횟수</td><td>카드가 쌓일수록 파훼 시도가 늘어나는지</td><td>파훼 검사</td></tr><tr><td>파훼 / 벽 충돌</td><td>붙어서 깬 수, 알아차리기 전에 깨진 수, 벽에 부딪힌 수</td><td>파훼가 봇 판단으로 된 건지</td><td>파훼 검사 (숫자 확인 전까지 화면에 안 씀)</td></tr><tr><td>웨이브 4 묶음 겹침</td><td>앞 묶음이 남은 채로 다음 묶음이 나온 횟수</td><td>묶음 간격 10초 의도 확인</td><td>묶음 간격 검사</td></tr><tr><td>웨이브 4 동시에 있던 적 최대 수</td><td>숫자</td><td>적이 쌓이는지</td><td>묶음 간격 검사</td></tr><tr><td>고른 카드</td><td>1층 첫 4장, 고른 장 수</td><td>카드 효과 비교. 모든 판이 똑같이 고르는 1층 첫 4장만 써야 오래 산 판이 유리해 보이는 착시가 없음</td><td>카드별 비교, 공격력 카드와 평타 카드를 같이 모았을 때 검사</td></tr><tr><td>평타 쿨 바닥 / 평타 각도 최대 도달</td><td>예 / 아니오</td><td>카드 성장 상한에 닿는지</td><td>평타 쿨감 바닥 검사</td></tr><tr><td>죽은 곳</td><td>층, 웨이브</td><td>어디서 죽나</td><td>어디서 막히나</td></tr></tbody></table></div>
+<h2>3. 사건 기록 (일이 생길 때마다)</h2>
+<div class="tw"><table><thead><tr><th>무슨 일이 생길 때</th><th>남기는 값</th><th>어디에 쓰나</th></tr></thead><tbody><tr><td>판 시작</td><td>시드</td><td>다시 보기</td></tr><tr><td>웨이브 시작</td><td>층, 웨이브, 맵</td><td>웨이브별 걸린 시간 계산 시작점</td></tr><tr><td>묶음 등장</td><td>몇 번째 묶음인지</td><td>묶음 겹침 계산</td></tr><tr><td>웨이브 클리어</td><td>층, 웨이브, 걸린 시간</td><td>웨이브별 걸린 시간, 남은 체력</td></tr><tr><td>카드 제시</td><td>나온 카드 3장(카드, 단계)</td><td>다시 보기</td></tr><tr><td>카드 선택</td><td>고른 카드, 단계</td><td>고른 카드, 성장 상한 계산</td></tr><tr><td>층 클리어</td><td>층</td><td>다시 보기</td></tr><tr><td>무한 모드 시작</td><td>–</td><td>다시 보기</td></tr><tr><td>플레이어 공격</td><td>위치, 방향, 범위, 각도, 맞힌 수</td><td>휘두른 횟수, 헛스윙</td></tr><tr><td>플레이어 대시</td><td>위치</td><td>다시 보기</td></tr><tr><td>플레이어가 맞음</td><td>피해, 때린 적 종류, 공격 종류(근거리형, 원거리형, 휘두르기, 돌진), 남은 체력, 넉백 배율</td><td>받은 피해, 어떤 적에게 맞았나, 한 방에 크게 맞은 피해</td></tr><tr><td>적 공격 예고</td><td>적 번호, 적 종류(보스면 휘두르기, 돌진)</td><td>봇이 피할지 판단, 나온 공격 수</td></tr><tr><td>적 공격</td><td>위치, 방향, 범위, 각도</td><td>나온 공격 수, 다시 보기</td></tr><tr><td>적이 맞음</td><td>피해, 치명타 여부, 위치</td><td>다시 보기</td></tr><tr><td>적 처치</td><td>적 번호, 적 종류, 위치</td><td>처치 수</td></tr><tr><td>보스 등장 / 돌진 / 벽 충돌 / 그로기 / 파훼</td><td>보스 번호, 위치 등</td><td>파훼와 벽 충돌 수, 나온 돌진 수</td></tr><tr><td>사망</td><td>시각</td><td>판 결과, 죽은 곳</td></tr><tr><td>봇 판 종료(클리어, 시간 초과)</td><td>결과</td><td>판 결과</td></tr></tbody></table></div>
+<h2>4. 새로 더한 것 (11/21)</h2>
+<p>처음 정리할 때 없던 4개를 대시보드 판 요약에 더함. 더한 뒤 실력별 시드 1~200을 다시 돌렸고, 클리어, 사망, 시간 초과 수가 전과 같았음(11/21 값 기준 숙련 151/0/49, 중간 194/3/3, 초보 107/93/0). 기록만 늘린 거라 게임 결과는 그대로.</p>
+<p>11/22에 값이 바뀐 뒤(치명타 10%, 대시 쿨 1초, 슈퍼아머 30, 돌진 예고 2.5초) 같은 시드 결과: 숙련 179/0/21, 중간 200/0/0, 초보 169/31/0.</p>
+<div class="tw"><table><thead><tr><th>항목</th><th>판 요약 이름</th><th>남기는 값</th><th>왜 필요한가</th></tr></thead><tbody><tr><td>한 방에 크게 맞은 피해</td><td>maxHit</td><td>한 번에 받은 가장 큰 피해</td><td>한 번에 큰 피해를 받은 판을 튀는 판으로 짚기</td></tr><tr><td>보스 휘두르기 / 돌진 구분</td><td>hitBy, hitN, atkN의 slam, charge</td><td>공격별 받은 피해 / 맞은 횟수 / 나온 횟수</td><td>초보는 돌진만 피한다는 봇 실력 검사</td></tr><tr><td>누구한테 죽었나</td><td>deathBy</td><td>죽기 직전 마지막으로 맞은 공격(근거리형, 원거리형, 휘두르기, 돌진). 안 죽었으면 비움</td><td>죽은 원인별로 보기</td></tr><tr><td>층마다 나온 맵</td><td>maps</td><td>층 순서대로 나온 맵</td><td>맵별 결과 비교</td></tr></tbody></table></div>
+<ul><li>공격 종류는 게임이 "플레이어가 맞음" 사건에 직접 남김(attack: melee, ranged, slam, charge). 보스는 휘두르기와 돌진을 때릴 때 각각 넘기고, 일반 몹은 근거리 공격과 투사체에서 넘김. 예전처럼 넉백 배율로 짐작하지 않아서, 두 배율이 같아져도 안 깨짐</li><li>프로토타입까지 고친 건 직접 결정(11/21). 고치기 전과 판마다 비교해서 600판 모두 끝난 이유, 전투 시간, 공격별 맞은 횟수, 죽은 원인이 같은 걸 확인(프로토타입 메모 35번)</li><li>죽은 원인(11/22 값): 사망은 초보 31판뿐이고 전부 휘두르기. 11/21 값에서는 중간 사망 3판 전부 휘두르기, 초보 사망 93판은 휘두르기 91, 돌진 1, 근거리형 1</li><li>맵은 지금 전부 M001이라, 맵별 비교는 맵이 늘어나야 의미가 생김</li></ul>
+<p>환경 조건(<code>data/env.js</code>)은 아직 게임에 없어서 기록할 것 없음. 들어가면 웨이브 시작 사건과 판 요약에 같이 남김.</p>
+<h2>5. 저장과 불러오기</h2>
+<p>지금 대시보드(<code>dashboard/app.js</code>)에 있음.</p>
+<ul><li><strong>브라우저 임시 저장</strong>: 조정판으로 돌린 조건은 보는 사람 브라우저에 최근 10개까지. 저장 공간이 모자라면 최근 3개만</li><li><strong>JSON 다운로드</strong>: 돌린 조건들(조정값, 판 수, 판 요약 전부)을 <code>dashboard-conditions.json</code> 파일 하나로 받기</li><li><strong>불러오기</strong>: 받은 파일을 다시 올리면 조건 목록에 붙음</li><li><strong>기본 데이터</strong>: DT 문서 값(11/22)으로 실력별 200판(시드 1~200)을 미리 돌려서 <code>base.js</code>에 넣어 둠. 만드는 스크립트는 <code>gen.js</code></li></ul>
+<h2>6. 바뀔 수 있는 것</h2>
+<ul><li>대시보드 검사 규칙의 맞음 범위가 아직 안 정해짐. 정해지면서 새로 재야 할 값이 생기면 판 요약 항목이 늘어남</li><li>1맵 일반 웨이브 수는 지금 4개(체감 기준, 3과 4 사이에서 일단 4)라 3개와 비교할 수 있음. 웨이브별 걸린 시간과 실력별 생존이 이미 남고 있어서 기록 쪽은 따로 바꿀 것 없음</li></ul>
+<div class="pn"><span><a href="ai.html">← AI 역할 구분</a></span><span><a href="qa.html">QA 기록 →</a></span></div>
+</main>
+</body>
+</html>

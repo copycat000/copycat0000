@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QA 기록</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<style>:root{--bg:#f6f7f9;--card:#fff;--line:#e3e6eb;--text:#1d2129;--sub:#5d6573;--accent:#2f5d8a;--th:#f0f2f5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1115;--card:#171a20;--line:#2a2f38;--text:#e8eaf0;--sub:#9aa2b1;--accent:#6fa8dc;--th:#1e222a}}
+:root[data-theme="dark"]{--bg:#0f1115;--card:#171a20;--line:#2a2f38;--text:#e8eaf0;--sub:#9aa2b1;--accent:#6fa8dc;--th:#1e222a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.75 "IBM Plex Sans KR",system-ui,"Malgun Gothic",sans-serif}
+a{color:var(--accent)}nav{border-bottom:1px solid var(--line);background:var(--card)}
+nav .in{max-width:880px;margin:0 auto;padding:10px 16px;display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14px}
+nav a{text-decoration:none;color:var(--sub)}nav a.on{color:var(--text);font-weight:700}nav .home{color:var(--accent);margin-right:6px}
+main{max-width:880px;margin:0 auto;padding:32px 16px 64px}
+h1{font-size:26px;line-height:1.35;margin:0 0 4px}h2{font-size:20px;margin:40px 0 10px;padding-top:8px;border-top:1px solid var(--line)}h3{font-size:17px;margin:28px 0 8px}
+h1+p{color:var(--sub);font-size:13px;margin-top:0}
+.tw{overflow-x:auto;margin:14px 0}table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.55;background:var(--card)}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}th{background:var(--th);white-space:nowrap}
+code{font-size:13px;background:var(--th);padding:1px 4px;border-radius:4px}
+.pn{display:flex;justify-content:space-between;gap:12px;margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:14px}
+.list a{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin-bottom:10px}
+.list a:hover{border-color:var(--accent)}.list b{font-size:16px}.list span{display:block;color:var(--sub);font-size:14px}</style>
+</head>
+<body>
+<nav><div class="in"><a class="home" href="../">← 처음으로</a><a href="./">작업 기록 목록</a><a href="ai.html">AI 역할 구분</a><a href="log.html">로그 기록 항목</a><a href="qa.html" class="on">QA 기록</a><a href="notes.html">프로토타입 메모</a></div></nav>
+<main>
+<h1>QA 기록</h1>
+<p>직접 해 보면서 나온 문제와 처리 결과.<br>상태: 확인 대기(고쳤고 다시 해 봐야 함) / 확인 완료 / 보류</p>
+<div class="tw"><table><thead><tr><th>번호</th><th>날짜</th><th>해 보면서 본 것</th><th>원인</th><th>처리</th><th>상태</th></tr></thead><tbody><tr><td>QA-01</td><td>11/20</td><td>원거리형(예고 중)을 밀면 보이는 몸보다 더 멀리서부터 밀림</td><td>원거리형은 삼각형으로 그렸는데 몸 판정은 원이라, 삼각형 바깥 빈 곳까지 판정이 있었음. 예고 중엔 적이 멈춰 있어서 더 잘 보였을 것</td><td>원거리형도 판정과 같은 원으로 그리고, 안에 삼각형 표시를 넣어 근거리형과 구분</td><td>확인 대기</td></tr><tr><td>QA-02</td><td>11/20</td><td>8방향인데 상하좌우처럼 딱딱함. 대시할 때 더 크게 느껴짐</td><td>대각선으로 가다 두 키를 동시에 못 떼면, 나중에 뗀 키 방향(상하좌우)으로 바라보는 방향이 바뀜. 멈춰서 대시하면 그 방향으로 나가서 대시 때 특히 티가 남 (추정, 키 입력 순서로 재현은 확인)</td><td>대각선에서 키 하나를 먼저 떼도 0.08초 안이면 바라보는 방향은 대각선 유지. 이동은 누른 키 그대로</td><td>확인 대기</td></tr><tr><td>QA-03</td><td>11/20</td><td>QA-01을 고친 뒤에도 원거리형 예고 즈음에 다가가면 몸보다 한참 밖에서 밀려남</td><td>몸 판정이 아니라 원거리형 행동 규칙으로 보임. 쏜 뒤 쿨타임 중에 플레이어가 경계 범위(150px) 안에 들어오면 뒤로 물러남(시스템 기획 2번). 물러나는 속도(120)가 플레이어(200)보다 느려서 밀어내는 것처럼 보임 (추정)</td><td>코드 수정 없음. 직접 확인해 보니 규칙대로 물러나는 것 맞음. 도형이라 도망치는 건지 밀리는 건지 구분이 안 됐던 것. 물러나는 동안 보라색으로 바뀌게 그림만 추가</td><td>확인 완료</td></tr><tr><td>QA-04</td><td>11/20</td><td>대시 움직임이 매끄럽지 않음. 특히 대시가 끝나고 바로 방향을 꺾거나 움직일 때</td><td>원인 후보 두 개. ① 규칙은 1초에 60번 계산하는데 모니터가 더 자주 그리면 빠른 대시가 끊겨 보임 ② 대시 속도(초당 600px)에서 걷기 속도(200)로 한 번에 떨어짐</td><td>①만 처리. 직전 위치와 지금 위치 사이를 이어서 그리게 함(그림만 바뀌고 규칙은 그대로). ②는 대시 끝에 감속을 넣는 규칙 변경이라 다시 해 보고 판단</td><td>확인 대기</td></tr><tr><td>QA-05</td><td>11/20</td><td>공격이 "띡 띡" 끊기는 느낌이고, 적이 맞았다는 피드백이 너무 약함</td><td>부채꼴이 통째로 0.12초 깜빡이는 게 전부였고, 맞은 적 반응은 하얗게 한 번 번쩍이는 것뿐이었음</td><td>그림과 시간만 추가(규칙 계산 결과는 그대로). 휘두르는 궤적, 피해 숫자(치명타는 노란색 + !), 맞은 적 떨림, 죽을 때 퍼지는 원, 맞으면 화면 전체 0.05초 멈춤(히트스톱, 사람이 할 때만이고 시뮬레이션에는 없음)</td><td>확인 대기</td></tr><tr><td>QA-06</td><td>11/20</td><td>피드백이 더 필요함. 플레이어가 맞을 때 화면 진동, 몹 타격 때 히트스톱</td><td>플레이어가 맞아도 깜빡이는 것 말고 반응이 없었음. 몹 타격 히트스톱(0.05초)은 이미 있었는데 짧아서 덜 느껴졌을 수 있음</td><td>플레이어 피격 때 화면 진동(0.2초), 치명타 때 약한 진동(0.1초) + 히트스톱 0.08초로 늘림. 확인용으로 치명타 확률 50%, 대시 거리 60px로 바꿈</td><td>확인 대기</td></tr><tr><td>QA-07</td><td>11/20</td><td>테스트할 때 껐다 켰다 하기 불편함</td><td>일시정지가 없었음</td><td>P, Esc로 일시정지. 창을 벗어나면 자동 일시정지</td><td>확인 대기</td></tr><tr><td>QA-08</td><td>11/20</td><td>방향 바꾸는 게 매끄럽지 않음 (QA-02에서 이어짐)</td><td>방향 8칸은 키보드 한계. 거기에 방향 표시가 45도씩 한 번에 넘어가서 더 끊겨 보임</td><td>방향 표시만 빠르게 돌아가며 따라가게 함(판정 방향은 바로 바뀜). T로 켜고 꺼서 이전과 비교 가능</td><td>확인 완료 (방향이 도는 게 보이니 딱딱함이 풀림. 시각 피드백 문제였음)</td></tr><tr><td>QA-09</td><td>11/20</td><td>대시 60px는 짧음. 조작에 후딜레이 느낌이 남아 있음</td><td>후딜 원인 후보 ① 쿨타임 끝나기 직전에 누른 공격, 대시가 그냥 버려져서 "눌렀는데 안 나감" ② 맞힐 때 히트스톱 동안 캐릭터도 같이 멈춤 (둘 다 추정)</td><td>대시 120px로 되돌림. ①은 입력 미리 받기(0.12초) 추가. ①과 ②를 B, H 키로 각각 켜고 꺼서 어느 쪽이 원인인지 비교 가능</td><td>확인 완료 (입력 미리 받기는 꺼진 쪽이 체감이 나아서 기본 꺼짐. 히트스톱은 켜도 꺼도 차이가 크지 않아서 후딜 원인 아님)</td></tr><tr><td>QA-10</td><td>11/20</td><td>피격감은 있는데 타격감이 부족함</td><td>맞은 쪽 반응이 떨림과 숫자뿐이었음</td><td>칼 닿은 자리에 불꽃, 맞은 적이 찌그러졌다 돌아옴(그림만). 넉백 16px 추가(규칙, K로 켜고 끔). 타격음은 나중으로 미룸(프로토타입 메모 참고)</td><td>확인 완료 (넉백은 지금 상태 유지, 예고 중에도 밀림. 값은 밸런스 조절 때 다시)</td></tr><tr><td>QA-11</td><td>11/20</td><td>히트스톱을 켜도 꺼도 큰 차이가 없음</td><td>0.05초(3프레임)라 너무 짧았고, 멈추는 동안 궤적, 불꽃, 숫자는 계속 움직여서 멈춤이 묻혔음</td><td>0.09초(치명타 0.12초)로 늘리고, 멈추는 동안 이펙트도 같이 멈추게 함. 맞힌 공격은 궤적이 다 그려진 순간에서 멈춤. H로 다시 비교. 그래도 차이가 없으면 뺌</td><td>확인 완료 (차이는 느껴지지만 핵앤슬래시 느낌에 가까워서 평타엔 꺼 둠. 보스 카운터나 패턴 파훼 같은 순간에 쓰기로 해서 기본 꺼짐, 기능은 남김)</td></tr><tr><td>QA-12</td><td>11/20</td><td>타격 이펙트가 잘 안 보임(죽을 때 퍼지는 원을 타격 이펙트로 착각)</td><td>불꽃 선이 짧고(18px) 얇고(2px) 0.12초라 눈에 안 들어왔음</td><td>선 길이 40px(치명타 56), 굵기 4~5px, 0.2초로 키우고 닿은 자리에 번쩍이는 원 추가. 시각 이펙트 문제인지 확인용</td><td>확인 완료 (타격감 부족은 시각 이펙트 문제가 더 컸음)</td></tr><tr><td>QA-13</td><td>11/20</td><td>보스가 없어서 단조롭고 강해지는 체감이 약함(아래 "아직 손 안 댄 것" 첫 항목)</td><td>오래 버티는 상대가 없어서 강해진 걸 확인할 대상이 없었음(직접 판단)</td><td>보스 기획서대로 보스 1 추가(5번째 웨이브). 수치는 전부 임시값(프로토타입 메모 24번). 시작 화면에서 5를 누르면 바로 보스</td><td>확인 대기</td></tr></tbody></table></div>
+<h2>아직 손 안 댄 것</h2>
+<ul><li>(11/20) 보스가 없어서 단조롭고, 강해지는 체감이 약함. 보스는 2차 범위(시스템 기획 보스 부분부터). 강해짐 체감은 카드 증가폭(공격력 1단계 +2 = 20%)이 작고 적이 2~3대에 죽어서 차이가 잘 안 느껴지는 구조로 보임(추정). DT 증가폭과 적 체력 쪽에서 볼 일. 직접 판단한 문제는 강해진 걸 확인할 상대(오래 버티는 상대)가 없다는 것. 일반 적은 2~3대면 죽어서 3대에서 2대로 줄어드는 차이밖에 안 남음. 보스처럼 체력이 큰 상대가 강해짐을 재는 기준이 됨</li><li>경직(맞으면 잠깐 굳음), 맞으면 예고가 끊기는지는 아직 없음. 넉백은 QA-10에서 테스트용으로 들어감. 직접 정할 일</li><li>QA-02의 딱딱한 느낌이 방향 문제만인지, 움직임이 가속 없이 바로 최고 속도로 시작하고 멈추는 탓도 있는지는 다시 해 보고 판단. 가속을 넣으면 이동 규칙이 바뀌는 거라 시스템 기획에서 정할 일</li></ul>
+<div class="pn"><span><a href="log.html">← 로그 기록 항목</a></span><span><a href="notes.html">프로토타입 메모 →</a></span></div>
+</main>
+</body>
+</html>

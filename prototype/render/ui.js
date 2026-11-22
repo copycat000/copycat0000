@@ -57,7 +57,7 @@ G.UI = (function () {
       }
       if (G.Sound) text(ctx, 'M 소리 ' + (G.Sound.isOn() ? '켜짐' : '꺼짐'), 282, 58, 12, G.Sound.isOn() ? '#8a90a0' : '#6b7180');
 
-      text(ctx, (s.infinite ? '무한 · ' : '') + s.floor + '층 ' + floorName(s, s.floor) + '  웨이브 ' + s.wave + ' / ' + s.dt.common.wavesPerFloor + (isBossWave(s) ? ' (보스)' : ''), s.W - 20, 27, 18, '#e8eaf0', 'right');
+      text(ctx, (s.infinite ? '무한 | ' : '') + s.floor + '층 ' + floorName(s, s.floor) + '  웨이브 ' + s.wave + ' / ' + s.dt.common.wavesPerFloor + (isBossWave(s) ? ' (보스)' : ''), s.W - 20, 27, 18, '#e8eaf0', 'right');
 
       // 보스 체력 바(화면 아래 가운데, 보스가 12시에서 나와서 위에 두면 가려짐). 돌진 예고 중엔 아래에 슈퍼아머 게이지
       for (var b = 0; b < s.enemies.length; b++) {
@@ -71,7 +71,7 @@ G.UI = (function () {
         if (e.state === 'chargeTele') {
           ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(bx, by + 18, bw, 8);
           ctx.fillStyle = '#ffcf66'; ctx.fillRect(bx, by + 18, bw * Math.max(0, e.armor / e.armorMax), 8);
-          text(ctx, '슈퍼아머 · 다 깎으면 파훼', s.W / 2, by + 38, 12, '#ffcf66', 'center');
+          text(ctx, '슈퍼아머 (다 깎으면 파훼)', s.W / 2, by + 38, 12, '#ffcf66', 'center');
         } else if (e.state === 'groggy') {
           text(ctx, e.groggyKind === 'break' ? '파훼! 그로기 ' + e.groggyTime.toFixed(1) : '벽 충돌 그로기 ' + e.groggyTime.toFixed(1), s.W / 2, by + 28, 14, '#ffcf66', 'center');
         }
@@ -81,22 +81,22 @@ G.UI = (function () {
     start: function (ctx, s) {
       dim(ctx, s);
       text(ctx, '가라앉는 늪', s.W / 2, s.H / 2 - 80, 44, '#e8eaf0', 'center');
-      text(ctx, '방향키 이동   A 공격   Space 대시   S·D 스킬   P 일시정지   M 소리', s.W / 2, s.H / 2 - 10, 20, '#b9bfcc', 'center');
-      text(ctx, '카드 고르기: 1·2·3 또는 ←→ 후 Enter', s.W / 2, s.H / 2 + 24, 16, '#8a90a0', 'center');
+      text(ctx, '방향키 이동   A 공격   Space 대시   S, D 스킬   P 일시정지   M 소리', s.W / 2, s.H / 2 - 10, 20, '#b9bfcc', 'center');
+      text(ctx, '카드 고르기: 1, 2, 3 또는 ←→ 후 Enter', s.W / 2, s.H / 2 + 24, 16, '#8a90a0', 'center');
       text(ctx, '5번째 웨이브는 보스. 시작 화면에서 5 를 누르면 바로 보스부터', s.W / 2, s.H / 2 + 50, 14, '#6b7180', 'center');
       text(ctx, 'Enter 를 눌러 시작', s.W / 2, s.H / 2 + 90, 22, '#4da3ff', 'center');
     },
 
     card: function (ctx, s, sel, slotFor, slotSel) {
       dim(ctx, s);
-      text(ctx, (isBossWave(s) ? '보스 처치' : '웨이브 ' + s.wave + ' 클리어') + ' · 카드 한 장을 고르세요', s.W / 2, 150, 26, '#e8eaf0', 'center');
+      text(ctx, (isBossWave(s) ? '보스 처치' : '웨이브 ' + s.wave + ' 클리어') + '  |  카드 한 장을 고르세요', s.W / 2, 150, 26, '#e8eaf0', 'center');
       var w = 260, h = 350, gap = 40, x0 = s.W / 2 - (w * 3 + gap * 2) / 2;
       for (var i = 0; i < s.cardOffer.length; i++) {
         var pick = s.cardOffer[i], c = G.Core.cards.find(s, pick.id), x = x0 + i * (w + gap), y = 195;
         ctx.fillStyle = '#23262e'; ctx.fillRect(x, y, w, h);
         ctx.strokeStyle = i === sel ? '#4da3ff' : '#3a3f4b'; ctx.lineWidth = i === sel ? 4 : 2; ctx.strokeRect(x, y, w, h);
         var sdef = c.group === 'skill' ? s.dt.skills.list[c.skill] : null;
-        text(ctx, c.group === 'basic' ? '기본 공격 강화' : sdef ? '스킬 · ' + (sdef.kind === 'attack' ? '공격형' : '유틸형') : '능력치', x + w / 2, y + 22, 13, '#8a90a0', 'center');
+        text(ctx, c.group === 'basic' ? '기본 공격 강화' : sdef ? '스킬  |  ' + (sdef.kind === 'attack' ? '공격형' : '유틸형') : '능력치', x + w / 2, y + 22, 13, '#8a90a0', 'center');
         // 카드 그림 자리(임시). 그림이 생기면 여기에 그림
         var ix = x + 24, iy = y + 40, iw = w - 48, ih = 140;
         // 종류별 색: 시안 생존, 마젠타 공격, 옐로 평타(CMYK에서 검정 뺀 세 색)
@@ -112,16 +112,16 @@ G.UI = (function () {
       if (slotFor >= 0) {
         ctx.fillStyle = 'rgba(10,11,14,0.85)'; ctx.fillRect(0, 0, s.W, s.H);
         var sc = G.Core.cards.find(s, s.cardOffer[slotFor].id);
-        text(ctx, sc.name + ' · 어느 칸에 넣을까요?', s.W / 2, 220, 26, '#e8eaf0', 'center');
+        text(ctx, sc.name + '  |  어느 칸에 넣을까요?', s.W / 2, 220, 26, '#e8eaf0', 'center');
         for (var k = 0; k < 2; k++) {
           var cur = s.player.skills[k], bx2 = s.W / 2 - 230 + k * 240, by2 = 270;
           ctx.fillStyle = '#23262e'; ctx.fillRect(bx2, by2, 220, 120);
           ctx.strokeStyle = k === slotSel ? '#4da3ff' : '#3a3f4b'; ctx.lineWidth = k === slotSel ? 4 : 2; ctx.strokeRect(bx2, by2, 220, 120);
-          text(ctx, (k === 0 ? 'S' : 'D') + ' · 스킬 ' + (k + 1), bx2 + 110, by2 + 32, 18, '#8a90a0', 'center');
+          text(ctx, (k === 0 ? 'S' : 'D') + '  |  스킬 ' + (k + 1), bx2 + 110, by2 + 32, 18, '#8a90a0', 'center');
           text(ctx, cur ? s.dt.skills.list[cur.id].label : '빈칸', bx2 + 110, by2 + 68, 22, cur ? '#e8eaf0' : '#6b7180', 'center');
           if (cur) text(ctx, '바꾸면 없어짐', bx2 + 110, by2 + 98, 13, '#ff9a8a', 'center');
         }
-        text(ctx, 'S·D 또는 ←→ 후 Enter   Esc 카드 다시 고르기', s.W / 2, 430, 16, '#8a90a0', 'center');
+        text(ctx, 'S, D 또는 ←→ 후 Enter   Esc 카드 다시 고르기', s.W / 2, 430, 16, '#8a90a0', 'center');
       }
     },
 
@@ -136,7 +136,7 @@ G.UI = (function () {
     // 봇 다시 보기 표시(왼쪽 아래): 실력, 시드, 이 층 지난 시간 / 제한 시간
     botTag: function (ctx, s, bot) {
       var lim = bot.cfg.floorTimeLimit, used = s.time - bot.floorStart;
-      text(ctx, '봇 다시 보기 · ' + bot.cfg.levels[bot.level].label + ' · 시드 ' + s.seed, 16, s.H - 36, 14, '#ffcf66');
+      text(ctx, '봇 다시 보기  |  ' + bot.cfg.levels[bot.level].label + '  |  시드 ' + s.seed, 16, s.H - 36, 14, '#ffcf66');
       text(ctx, '이 층 ' + used.toFixed(0) + '초 / 제한 ' + lim + '초   피하기 ' + bot.stats.dodges + '번', 16, s.H - 16, 13, used > lim * 0.8 ? '#ff7a7a' : '#b9bfcc');
     },
 
@@ -160,7 +160,7 @@ G.UI = (function () {
       dim(ctx, s);
       var next = s.floor + 1, inf = next > s.dt.common.floorCount;
       text(ctx, s.floor + '층 돌파', s.W / 2, s.H / 2 - 40, 40, '#e8eaf0', 'center');
-      text(ctx, (inf ? '무한 모드 · ' : '') + next + '층 · ' + floorName(s, next), s.W / 2, s.H / 2 + 20, 28, '#b9bfcc', 'center');
+      text(ctx, (inf ? '무한 모드  |  ' : '') + next + '층  |  ' + floorName(s, next), s.W / 2, s.H / 2 + 20, 28, '#b9bfcc', 'center');
       text(ctx, 'Enter 를 눌러 계속', s.W / 2, s.H / 2 + 80, 18, '#4da3ff', 'center');
     },
 
@@ -168,9 +168,9 @@ G.UI = (function () {
       dim(ctx, s);
       var r = s.result;
       var OUT = { death: '사망', clear: '클리어 (5층 돌파)', timeout: '시간 초과 (못 깬 것)' };
-      text(ctx, r.outcome ? '결과 · 봇 ' + s.dt.bots.levels[r.botLevel].label + ' · ' + OUT[r.outcome] : '결과', s.W / 2, 120, r.outcome ? 32 : 40, '#e8eaf0', 'center');
+      text(ctx, r.outcome ? '결과  |  봇 ' + s.dt.bots.levels[r.botLevel].label + '  |  ' + OUT[r.outcome] : '결과', s.W / 2, 120, r.outcome ? 32 : 40, '#e8eaf0', 'center');
       if (r.outcome) text(ctx, '시드 ' + r.seed, s.W / 2, 150, 14, '#8a90a0', 'center');
-      text(ctx, '도달: ' + (s.infinite ? '무한 · ' : '') + r.floor + '층 웨이브 ' + r.wave + '    걸린 시간: ' + fmtTime(r.time), s.W / 2, 180, 20, '#b9bfcc', 'center');
+      text(ctx, '도달: ' + (s.infinite ? '무한 | ' : '') + r.floor + '층 웨이브 ' + r.wave + '    걸린 시간: ' + fmtTime(r.time), s.W / 2, 180, 20, '#b9bfcc', 'center');
       text(ctx, '고른 카드 (' + r.picks.length + '장)', s.W / 2, 230, 18, '#8a90a0', 'center');
       var cols = 3, colW = 340, x0 = s.W / 2 - colW * cols / 2;
       var maxShow = 30;

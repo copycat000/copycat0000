@@ -7,49 +7,49 @@ var G = globalThis.G = globalThis.G || {};
 G.Dash = G.Dash || {};
 
 G.Dash.RULES = [
-  { id: 'R1', name: '숙련 봇 시간 초과', src: 'DT · 층당 제한 시간',
+  { id: 'R1', name: '숙련 봇 시간 초과', src: 'DT: 층당 제한 시간',
     sentence: '약한 봇은 시간 초과가 날 수 있다',
     measure: '숙련 봇 시간 초과 비율', unit: '%',
     get: function (M) { return M.skilled.timeout / M.skilled.n * 100; },
     range: [null, 5], temp: true },
 
-  { id: 'R2', name: '1층 보스 처치 시간', src: 'DT · 보스 체력',
+  { id: 'R2', name: '1층 보스 처치 시간', src: 'DT: 보스 체력',
     sentence: '카드 없이 약 23초',
     measure: '1층 보스 웨이브 평균 걸린 시간(중간 봇)', unit: '초',
     get: function (M) { return M.mid.boss1; },
     range: [20, 26], temp: true },
 
-  { id: 'R3', name: '중간 봇 근거리형 예고', src: 'DT · 봇 실력',
+  { id: 'R3', name: '중간 봇 근거리형 예고', src: 'DT: 봇 실력',
     sentence: '중간은 근거리형 예고를 못 피한다',
     measure: '중간 봇이 근거리형 공격에 맞은 비율', unit: '%',
     get: function (M) { return M.mid.hitRate.melee * 100; },
     range: [50, null], temp: true },
 
-  { id: 'R4a', name: '초보 봇 돌진 피하기', src: 'DT · 봇 실력',
+  { id: 'R4a', name: '초보 봇 돌진 피하기', src: 'DT: 봇 실력',
     sentence: '초보는 보스 돌진만 피하고 나머지는 거의 맞는다',
     measure: '초보 봇이 돌진에 맞은 비율', unit: '%',
     get: function (M) { return M.novice.hitRate.charge * 100; },
     range: [null, 20], temp: true },
 
-  { id: 'R4b', name: '초보 봇 휘두르기', src: 'DT · 봇 실력',
+  { id: 'R4b', name: '초보 봇 휘두르기', src: 'DT: 봇 실력',
     sentence: '초보는 보스 돌진만 피하고 나머지는 거의 맞는다',
     measure: '초보 봇이 휘두르기에 맞은 비율', unit: '%',
     get: function (M) { return M.novice.hitRate.slam * 100; },
     range: [70, null], temp: true },
 
-  { id: 'R5', name: '웨이브 4 묶음 겹침', src: 'DT · 묶음 간격',
+  { id: 'R5', name: '웨이브 4 묶음 겹침', src: 'DT: 묶음 간격',
     sentence: '웨이브 4는 앞 묶음을 못 잡고 겹친다',
     measure: '웨이브 4에서 앞 묶음이 남은 채 다음 묶음이 나온 비율(중간 봇)', unit: '%',
     get: function (M) { return M.mid.w4over * 100; },
     range: [50, null], temp: true },
 
-  { id: 'R6', name: '근거리형 한 마리는 피할 수 있게', src: 'DT · 대시 쿨타임',
+  { id: 'R6', name: '근거리형 한 마리는 피할 수 있게', src: 'DT: 대시 쿨타임',
     sentence: '근거리형 한 마리 공격은 매번 피할 수 있게',
     measure: '숙련 봇이 대시 쿨 중에 근거리형에게 맞은 횟수(판당)', unit: '번',
     get: function (M) { return M.skilled.meleeHitDashCd; },
     range: [null, 0.2], temp: true },
 
-  { id: 'R7', name: '평타 쿨감 바닥', src: 'DT · 평타 쿨타임 감소',
+  { id: 'R7', name: '평타 쿨감 바닥', src: 'DT: 평타 쿨타임 감소',
     sentence: '한 판 25장이라 3단계 4장이나 1단계 10장이면 닿을 수 있다',
     measure: '평타 쿨타임이 바닥에 닿은 판 비율(세 실력 합)', unit: '%',
     get: function (M) { var t = 0, n = 0; ['skilled', 'mid', 'novice'].forEach(function (l) { t += M[l].cdFloor * M[l].n; n += M[l].n; }); return t / n * 100; },
@@ -68,8 +68,8 @@ G.Dash.RULES = [
     },
     range: [5, null], temp: true },
 
-  { id: 'R10', name: '공격력·평타 카드 곱하기', src: '시스템 기획 0번',
-    sentence: '공격력·평타 카드를 같이 모을수록 서로 키워준다',
+  { id: 'R10', name: '공격력, 평타 카드 곱하기', src: '시스템 기획 0번',
+    sentence: '공격력, 평타 카드를 같이 모을수록 서로 키워 준다',
     measure: '둘 다 고른 판의 초당 피해 증가 − (공격력만 증가 + 평타만 증가), 1층 첫 4장 기준(세 실력 중 가장 낮은 값)', unit: '',
     get: function (M) {
       var worst = Infinity;

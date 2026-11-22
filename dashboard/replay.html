@@ -22,7 +22,7 @@
   시드 <input id="botSeed" type="number" min="0" value="1">
   <button id="botGo">보기</button>
   <button id="humanGo">사람이 하기</button>
-  · <a href="index.html">대시보드로</a> · <a href="../">처음으로</a> <span id="condTxt"></span>
+  | <a href="index.html">대시보드로</a> | <a href="../">처음으로</a> <span id="condTxt"></span>
 </div>
 
 <!-- DT 데이터 -->
@@ -43,7 +43,7 @@
     var q = new URLSearchParams(location.search), S = G.Dash.sim, k = S.docKnobs(), ch = [];
     S.KNOBS.forEach(function (d) { if (q.has(d.id)) { var v = parseFloat(q.get(d.id)); if (!isNaN(v)) k[d.id] = v; } if (Math.abs(k[d.id] - d.doc) > 1e-9) ch.push(d.label + ' ' + k[d.id] + d.unit); });
     G.DT = S.makeDT(G.DT, k);
-    document.getElementById('condTxt').textContent = '· 조건: ' + (ch.length ? ch.join(', ') : '문서 값');
+    document.getElementById('condTxt').textContent = '| 조건: ' + (ch.length ? ch.join(', ') : '문서 값');
   })();
 </script>
 <!-- 규칙 계산(화면과 분리) -->
