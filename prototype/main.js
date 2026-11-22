@@ -9,7 +9,7 @@
   var paused = false;        // 일시정지(P 또는 Esc). 전투 중에만      // start / play
   var s = null, cardSel = 0;
   var effects = [];          // 공격 부채꼴처럼 잠깐 보이는 그림(규칙과 무관)
-  var EFFECT_LIFE = { swing: 0.14, enemySwing: 0.15, damageNumber: 0.6, deathPuff: 0.25, hitSpark: 0.2, breakBurst: 0.45, wallDust: 0.35 };
+  var EFFECT_LIFE = { skillClear: 0.35, skillHeal: 0.6, swing: 0.14, enemySwing: 0.15, damageNumber: 0.6, deathPuff: 0.25, hitSpark: 0.2, breakBurst: 0.45, wallDust: 0.35 };
   // 보스 파훼 순간: 평타 히트스톱(H)과 상관없이 항상 멈춤(11/20 타디온: 보스 카운터·파훼 순간에 쓰기로). 임시값
   var BREAK_HITSTOP = 0.3,  /* 0.15에서 2배, 타디온 확정(11/20): 길게 멈춰야 해냈다는 피드백이 강함 */ SHAKE_BREAK = { time: 0.25, amp: 8 }, SHAKE_WALL = { time: 0.18, amp: 6 };
   var LOCKMOVE_ON = true;    // 밀리는 동안 조작 불가(타디온 확정 11/20). L로 켜고 끔(비교용)
@@ -69,7 +69,7 @@
     botLevel = level; seedOverride = seed >>> 0; newRun();
   };
   G.humanPlay = function () { botLevel = null; bot = null; seedOverride = null; screen = 'start'; s = null; };
-  var bot = null, botPick = -1, botWaitUntil = 0, botFloorAt = -1;
+  var slotFor = -1, slotSel = 0, botSlot, bot = null, botPick = -1, botWaitUntil = 0, botFloorAt = -1;
   function botEnd() {
     var end = G.Core.bot.checkEnd(bot, s);
     if (end) { G.Core.bot.finish(bot, s, end); console.log('[bot] ' + botLevel + ' 판 끝: ' + end); }
@@ -111,7 +111,7 @@
     var wm = /[?&]wave=(\d+)/.exec(location.search);     // 테스트용: ?wave=5 또는 시작 화면에서 5 → 1층 보스 웨이브부터
     s = G.Core.game.create(G.DT, seed, { startWave: startWave || (wm ? parseInt(wm[1], 10) : 1) });
     s.W = W; s.H = H;
-    effects = []; cardSel = 0; hitAt = {}; hitDir = {}; hitstopLeft = 0; scanned = 0; shakeLeft = 0; paused = false; visAngle = null; bufAttack = bufDash = -1;
+    effects = []; cardSel = 0; slotFor = -1; hitAt = {}; hitDir = {}; hitstopLeft = 0; scanned = 0; shakeLeft = 0; paused = false; visAngle = null; bufAttack = bufDash = -1;
     G.lastRun = s;
     bot = null;
     if (botLevel) { bot = G.Core.bot.create(s, botLevel); botPick = -1; botFloorAt = -1; G.lastBot = bot; }
@@ -166,7 +166,7 @@
           moveX: mx, moveY: my, faceX: face.x, faceY: face.y,
           attack: btn.attack,
           dash: btn.dash,
-          skill1: take('KeyS'),   // 스킬 자리(첫 판은 스킬 없음)
+          skill1: take('KeyS'),   // 스킬 1칸
           skill2: take('KeyD')
         };
         }
@@ -186,18 +186,33 @@
       }
       if (s.phase !== 'combat') { acc = 0; cardSel = 0; pressed = {}; bufAttack = bufDash = -1; }
     } else if (s.phase === 'card' && bot) {
-      if (botPick < 0) { botPick = G.Core.bot.pickCard(bot, s); cardSel = botPick; botWaitUntil = now + BOT_CARD_SHOW; }
-      else if (now >= botWaitUntil) { G.Core.game.chooseCard(s, botPick); botPick = -1; pressed = {}; }
+      if (botPick < 0) { botPick = G.Core.bot.pickCard(bot, s); botSlot = G.Core.bot.pickSlot(bot, s, botPick); cardSel = botPick; botWaitUntil = now + BOT_CARD_SHOW; }
+      else if (now >= botWaitUntil) { G.Core.game.chooseCard(s, botPick, botSlot); botPick = -1; pressed = {}; }
     } else if (s.phase === 'floor' && bot) {
       if (!botEnd()) {
         if (botFloorAt < 0) botFloorAt = now + BOT_FLOOR_SHOW;
         else if (now >= botFloorAt) { G.Core.game.nextFloor(s); botEnd(); botFloorAt = -1; pressed = {}; }   // 층 바뀐 순간을 대량 실행과 같은 틱에 기록
       }
     } else if (s.phase === 'card') {
-      if (take('ArrowLeft')) cardSel = (cardSel + s.cardOffer.length - 1) % s.cardOffer.length;
-      if (take('ArrowRight')) cardSel = (cardSel + 1) % s.cardOffer.length;
-      var choice = take('Digit1') ? 0 : take('Digit2') ? 1 : take('Digit3') ? 2 : take('Enter') ? cardSel : -1;
-      if (choice >= 0) { G.Core.game.chooseCard(s, choice); pressed = {}; }
+      if (slotFor >= 0) {          // 스킬 카드를 골랐으면 S·D 칸 고르기. Esc는 카드 고르기로 돌아감
+        if (take('Escape')) slotFor = -1;
+        else {
+          if (take('ArrowLeft') || take('ArrowUp')) slotSel = 0;
+          if (take('ArrowRight') || take('ArrowDown')) slotSel = 1;
+          var slot = (take('KeyS') || take('Digit1')) ? 0 : (take('KeyD') || take('Digit2')) ? 1 : take('Enter') ? slotSel : -1;
+          if (slot >= 0) { G.Core.game.chooseCard(s, slotFor, slot); slotFor = -1; pressed = {}; }
+        }
+      } else {
+        if (take('ArrowLeft')) cardSel = (cardSel + s.cardOffer.length - 1) % s.cardOffer.length;
+        if (take('ArrowRight')) cardSel = (cardSel + 1) % s.cardOffer.length;
+        var choice = take('Digit1') ? 0 : take('Digit2') ? 1 : take('Digit3') ? 2 : take('Enter') ? cardSel : -1;
+        if (choice >= 0) {
+          if (G.Core.cards.find(s, s.cardOffer[choice].id).group === 'skill') {
+            slotFor = choice; cardSel = choice; slotSel = s.player.skills[0] && !s.player.skills[1] ? 1 : 0;   // 빈 칸이 있으면 빈 칸부터
+            pressed = {};
+          } else { G.Core.game.chooseCard(s, choice); pressed = {}; }
+        }
+      }
     } else if (s.phase === 'floor') {
       if (take('Enter')) { G.Core.game.nextFloor(s); pressed = {}; }
     } else if (s.phase === 'dead') {
@@ -218,6 +233,7 @@
     prev.set(s.player, { x: s.player.x, y: s.player.y });
     for (var i = 0; i < s.enemies.length; i++) prev.set(s.enemies[i], { x: s.enemies[i].x, y: s.enemies[i].y });
     for (i = 0; i < s.projectiles.length; i++) prev.set(s.projectiles[i], { x: s.projectiles[i].x, y: s.projectiles[i].y });
+    for (i = 0; i < s.playerShots.length; i++) prev.set(s.playerShots[i], { x: s.playerShots[i].x, y: s.playerShots[i].y });
   }
   function lerped(o) {
     var a = prev.get(o);
@@ -291,6 +307,7 @@
       else Sh.enemy(ctx, shown, s.dt.enemies[e2.defId], since < 0.08);
     }
     for (k = 0; k < s.projectiles.length; k++) Sh.projectile(ctx, lerped(s.projectiles[k]));
+    for (k = 0; k < s.playerShots.length; k++) Sh.playerShot(ctx, lerped(s.playerShots[k]));
     var pv = Object.create(lerped(s.player));
     pv.facing = smoothFacing(s.player, now - (draw.prevNow || now)); draw.prevNow = now;
     Sh.player(ctx, pv, Math.floor(now * 20) % 2 === 0);
@@ -306,7 +323,7 @@
     if (bot) G.UI.botTag(ctx, s, bot);
     G.UI.testToggles(ctx, s, { smoothFacing: SMOOTH_FACING, buffer: BUFFER_ON, hitstop: HITSTOP_ON, knockback: KNOCKBACK_ON, lockMove: LOCKMOVE_ON });
     if (paused && s.phase === 'combat') G.UI.pause(ctx, s);
-    if (s.phase === 'card') G.UI.card(ctx, s, cardSel);
+    if (s.phase === 'card') G.UI.card(ctx, s, cardSel, slotFor, slotSel);
     else if (s.phase === 'floor') G.UI.floor(ctx, s);
     else if (s.phase === 'dead') G.UI.result(ctx, s);
   }

@@ -107,7 +107,7 @@ G.Dash.sim = {
           }
         }
         var a = S.aliveCount(s); if (a > curMax) curMax = a;
-      } else if (s.phase === 'card') C.game.chooseCard(s, C.bot.pickCard(bot, s));
+      } else if (s.phase === 'card') { var ci = C.bot.pickCard(bot, s); C.game.chooseCard(s, ci, C.bot.pickSlot(bot, s, ci)); }
       else if (s.phase === 'floor') C.game.nextFloor(s);
     }
     var r = C.bot.finish(bot, s, end);

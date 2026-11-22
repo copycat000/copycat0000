@@ -131,6 +131,11 @@ G.Sound = (function () {
       stopCharge();
       noise('lowpass', 4000, 300, 0.6, 0.55); tone('sine', 220, 45, 0.5, 0.55); tone('triangle', 700, 160, 0.3, 0.25);
     },
+    skillRush: function () { noise('bandpass', 3000, 500, 0.3, 0.35, { q: 1, peak: 0.3 }); },          // 스킬 소리는 콘셉트 표에 아직 없어서 임시: 돌진 베기는 긴 휙
+    skillShot: function () { noise('bandpass', 4200, 900, 0.22, 0.3, { q: 1.6, peak: 0.25 }); tone('triangle', 300, 180, 0.15, 0.12, { lp: 1500 }); },   // 검기: 날카로운 휙
+    skillInvuln: function () { tone('sine', 130, 130, 0.5, 0.18, { attack: 0.05 }); tone('sine', 196, 196, 0.5, 0.12, { attack: 0.08 }); },   // 무적: 낮은 화음
+    skillHeal: function () { tone('sine', 98, 147, 0.6, 0.2, { attack: 0.1 }); },                       // 회복: 낮은 음이 올라감
+    skillClear: function () { noise('lowpass', 2500, 200, 0.35, 0.3); },                              // 탄 지우기: 쓸려 나가는 소리
     bossCharge: function () { stopCharge(); },
     bossGroggy: function () { stopCharge(); },
     bossWall: function () { tone('sine', 95, 32, 0.35, 0.6); noise('lowpass', 450, 120, 0.18, 0.35); },   // 둔탁한 쿵

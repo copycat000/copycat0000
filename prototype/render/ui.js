@@ -2,6 +2,7 @@
 var G = globalThis.G = globalThis.G || {};
 
 G.UI = (function () {
+  var CARD_COLOR = { survive: '#00aeef', attack: '#ec008c', basic: '#fff200', skill: '#00ff00' };   // 인쇄 CMYK 원색에 가까운 값
   var FONT = '"Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif';
 
   function text(ctx, str, x, y, size, color, align) {
@@ -23,7 +24,7 @@ G.UI = (function () {
     return false;
   }
   function floorName(s, f) { var n = s.dt.common.floorNames; return (n && n[f - 1]) || s.dt.common.infiniteFloorName || ''; }
-  function effectText(c, v) { return c.label + ' ' + fmtValue(c, v); }   // 예: 최대 체력 +10
+  function effectText(c, v) { return c.group === 'skill' ? c.desc : c.label + ' ' + fmtValue(c, v); }   // 예: 최대 체력 +10
   function fmtTime(t) { var m = Math.floor(t / 60), sec = Math.floor(t % 60); return m + '분 ' + (sec < 10 ? '0' : '') + sec + '초'; }
 
   return {
@@ -42,12 +43,19 @@ G.UI = (function () {
       ctx.fillRect(16, 46, 120 * (1 - p.dashCd / p.dash.cooldown), 14);
       text(ctx, ready ? '대시 (Space)' : '대시 ' + p.dashCd.toFixed(1), 22, 53, 11);
 
-      // 스킬 2칸(첫 판은 빈칸)
+      // 스킬 2칸: 칸 안에 키, 아래에 스킬 이름. 쿨타임 중이면 남은 만큼 어둡게 덮고 남은 초
       for (var i = 0; i < 2; i++) {
-        ctx.strokeStyle = '#4a4f5c'; ctx.lineWidth = 2; ctx.strokeRect(146 + i * 34, 44, 28, 28);
-        text(ctx, i === 0 ? 'S' : 'D', 160 + i * 34, 58, 12, '#6b7180', 'center');
+        var sk = p.skills && p.skills[i], bx = 146 + i * 64, sdef = sk && s.dt.skills.list[sk.id];
+        ctx.fillStyle = sk ? 'rgba(0,255,0,0.18)' : 'rgba(0,0,0,0.3)'; ctx.fillRect(bx, 44, 58, 28);
+        if (sk && sk.cd > 0) {
+          var full = G.Core.skills.cooldown(s, sdef);
+          ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(bx, 44, 58, 28 * Math.min(1, sk.cd / full));
+        }
+        ctx.strokeStyle = sk ? (sk.cd > 0 ? '#3f7a4a' : '#6eff8c') : '#4a4f5c'; ctx.lineWidth = 2; ctx.strokeRect(bx, 44, 58, 28);
+        text(ctx, (i === 0 ? 'S' : 'D') + (sk && sk.cd > 0 ? ' ' + sk.cd.toFixed(1) : ''), bx + 29, 58, 12, sk ? '#e8eaf0' : '#6b7180', 'center');
+        if (sk) text(ctx, sdef.label, bx + 29, 82, 11, '#b9bfcc', 'center');
       }
-      if (G.Sound) text(ctx, 'M 소리 ' + (G.Sound.isOn() ? '켜짐' : '꺼짐'), 222, 58, 12, G.Sound.isOn() ? '#8a90a0' : '#6b7180');
+      if (G.Sound) text(ctx, 'M 소리 ' + (G.Sound.isOn() ? '켜짐' : '꺼짐'), 282, 58, 12, G.Sound.isOn() ? '#8a90a0' : '#6b7180');
 
       text(ctx, (s.infinite ? '무한 · ' : '') + s.floor + '층 ' + floorName(s, s.floor) + '  웨이브 ' + s.wave + ' / ' + s.dt.common.wavesPerFloor + (isBossWave(s) ? ' (보스)' : ''), s.W - 20, 27, 18, '#e8eaf0', 'right');
 
@@ -73,13 +81,13 @@ G.UI = (function () {
     start: function (ctx, s) {
       dim(ctx, s);
       text(ctx, '가라앉는 늪', s.W / 2, s.H / 2 - 80, 44, '#e8eaf0', 'center');
-      text(ctx, '방향키 이동   A 공격   Space 대시   S·D 스킬(첫 판은 빈칸)   P 일시정지   M 소리', s.W / 2, s.H / 2 - 10, 20, '#b9bfcc', 'center');
+      text(ctx, '방향키 이동   A 공격   Space 대시   S·D 스킬   P 일시정지   M 소리', s.W / 2, s.H / 2 - 10, 20, '#b9bfcc', 'center');
       text(ctx, '카드 고르기: 1·2·3 또는 ←→ 후 Enter', s.W / 2, s.H / 2 + 24, 16, '#8a90a0', 'center');
       text(ctx, '5번째 웨이브는 보스. 시작 화면에서 5 를 누르면 바로 보스부터', s.W / 2, s.H / 2 + 50, 14, '#6b7180', 'center');
       text(ctx, 'Enter 를 눌러 시작', s.W / 2, s.H / 2 + 90, 22, '#4da3ff', 'center');
     },
 
-    card: function (ctx, s, sel) {
+    card: function (ctx, s, sel, slotFor, slotSel) {
       dim(ctx, s);
       text(ctx, (isBossWave(s) ? '보스 처치' : '웨이브 ' + s.wave + ' 클리어') + ' · 카드 한 장을 고르세요', s.W / 2, 150, 26, '#e8eaf0', 'center');
       var w = 260, h = 350, gap = 40, x0 = s.W / 2 - (w * 3 + gap * 2) / 2;
@@ -87,16 +95,33 @@ G.UI = (function () {
         var pick = s.cardOffer[i], c = G.Core.cards.find(s, pick.id), x = x0 + i * (w + gap), y = 195;
         ctx.fillStyle = '#23262e'; ctx.fillRect(x, y, w, h);
         ctx.strokeStyle = i === sel ? '#4da3ff' : '#3a3f4b'; ctx.lineWidth = i === sel ? 4 : 2; ctx.strokeRect(x, y, w, h);
-        text(ctx, c.group === 'basic' ? '기본 공격 강화' : '능력치', x + w / 2, y + 22, 13, '#8a90a0', 'center');
+        var sdef = c.group === 'skill' ? s.dt.skills.list[c.skill] : null;
+        text(ctx, c.group === 'basic' ? '기본 공격 강화' : sdef ? '스킬 · ' + (sdef.kind === 'attack' ? '공격형' : '유틸형') : '능력치', x + w / 2, y + 22, 13, '#8a90a0', 'center');
         // 카드 그림 자리(임시). 그림이 생기면 여기에 그림
         var ix = x + 24, iy = y + 40, iw = w - 48, ih = 140;
-        ctx.fillStyle = '#1a1c22'; ctx.fillRect(ix, iy, iw, ih);
-        ctx.strokeStyle = '#3a3f4b'; ctx.lineWidth = 1.5; ctx.setLineDash([6, 5]); ctx.strokeRect(ix, iy, iw, ih); ctx.setLineDash([]);
-        text(ctx, '카드 그림 자리', x + w / 2, iy + ih / 2, 13, '#4a4f5c', 'center');
+        // 종류별 색: 시안 생존, 마젠타 공격, 옐로 평타(CMYK에서 검정 뺀 세 색)
+        ctx.fillStyle = CARD_COLOR[c.color] || '#1a1c22'; ctx.fillRect(ix, iy, iw, ih);
+        text(ctx, '카드 그림 자리', x + w / 2, iy + ih / 2, 13, 'rgba(0,0,0,0.45)', 'center');
         text(ctx, c.name || c.label, x + w / 2, y + 212, 24, '#e8eaf0', 'center');
         text(ctx, effectText(c, pick.value), x + w / 2, y + 248, 18, '#7bd88f', 'center');
-        text(ctx, pick.tier + '단계', x + w / 2, y + 285, 15, ['#b9bfcc', '#6fb3ff', '#ffcf66'][pick.tier - 1], 'center');
+        if (sdef) text(ctx, '쿨타임 ' + +G.Core.skills.cooldown(s, sdef).toFixed(1) + '초', x + w / 2, y + 285, 15, '#b9bfcc', 'center');
+        else text(ctx, pick.tier + '단계', x + w / 2, y + 285, 15, ['#b9bfcc', '#6fb3ff', '#ffcf66'][pick.tier - 1], 'center');
         text(ctx, '[' + (i + 1) + ']', x + w / 2, y + h - 22, 15, '#8a90a0', 'center');
+      }
+      // 스킬 카드를 골랐으면 넣을 칸 고르기. 찬 칸을 고르면 원래 스킬은 없어짐
+      if (slotFor >= 0) {
+        ctx.fillStyle = 'rgba(10,11,14,0.85)'; ctx.fillRect(0, 0, s.W, s.H);
+        var sc = G.Core.cards.find(s, s.cardOffer[slotFor].id);
+        text(ctx, sc.name + ' · 어느 칸에 넣을까요?', s.W / 2, 220, 26, '#e8eaf0', 'center');
+        for (var k = 0; k < 2; k++) {
+          var cur = s.player.skills[k], bx2 = s.W / 2 - 230 + k * 240, by2 = 270;
+          ctx.fillStyle = '#23262e'; ctx.fillRect(bx2, by2, 220, 120);
+          ctx.strokeStyle = k === slotSel ? '#4da3ff' : '#3a3f4b'; ctx.lineWidth = k === slotSel ? 4 : 2; ctx.strokeRect(bx2, by2, 220, 120);
+          text(ctx, (k === 0 ? 'S' : 'D') + ' · 스킬 ' + (k + 1), bx2 + 110, by2 + 32, 18, '#8a90a0', 'center');
+          text(ctx, cur ? s.dt.skills.list[cur.id].label : '빈칸', bx2 + 110, by2 + 68, 22, cur ? '#e8eaf0' : '#6b7180', 'center');
+          if (cur) text(ctx, '바꾸면 없어짐', bx2 + 110, by2 + 98, 13, '#ff9a8a', 'center');
+        }
+        text(ctx, 'S·D 또는 ←→ 후 Enter   Esc 카드 다시 고르기', s.W / 2, 430, 16, '#8a90a0', 'center');
       }
     },
 
@@ -152,7 +177,7 @@ G.UI = (function () {
       for (var i = 0; i < Math.min(r.picks.length, maxShow); i++) {
         var pk = r.picks[i], c = G.Core.cards.find(s, pk.id);
         var cx = x0 + (i % cols) * colW + 20, cy = 270 + Math.floor(i / cols) * 26;
-        text(ctx, pk.floor + '-' + pk.wave + '  ' + (c.name || c.label) + ' (' + effectText(c, pk.value) + ', ' + pk.tier + '단계)', cx, cy, 13, '#e8eaf0');
+        text(ctx, pk.floor + '-' + pk.wave + '  ' + (c.name || c.label) + (c.group === 'skill' ? ' (스킬, ' + (pk.slot === 1 ? 'D' : 'S') + '칸)' : ' (' + effectText(c, pk.value) + ', ' + pk.tier + '단계)'), cx, cy, 13, '#e8eaf0');
       }
       if (r.picks.length > maxShow) text(ctx, '외 ' + (r.picks.length - maxShow) + '장', s.W / 2, 270 + 10 * 26, 15, '#8a90a0', 'center');
       text(ctx, r.outcome ? 'Enter 를 누르면 같은 판을 처음부터 다시 봄' : 'Enter 를 눌러 다시 시작', s.W / 2, s.H - 70, 20, '#4da3ff', 'center');

@@ -20,7 +20,7 @@ G.Core.game = {
       floor: 1, wave: 1, infinite: false,
       phase: 'combat',
       player: G.Core.player.create(dt),
-      enemies: [], projectiles: [], nextUid: 1,
+      enemies: [], projectiles: [], playerShots: [], nextUid: 1,
       map: null, waveData: null, batchIndex: 0, batchTimer: 0,
       cardOffer: null, picks: [], pickedOnce: {}, hasSkill: false,
       stats: { kills: 0, damageDealt: 0, damageTaken: 0 },
@@ -36,7 +36,7 @@ G.Core.game = {
     var pool = s.dt.maps.pool;
     s.map = s.dt.maps.list[pool[s.rng.int(pool.length)]];
     s.player.x = s.map.width / 2; s.player.y = s.map.height / 2;   // 층마다 가운데로
-    s.enemies = []; s.projectiles = [];
+    s.enemies = []; s.projectiles = []; s.playerShots = [];
     s.wave = 1;
     s.phase = 'combat';
     G.Core.wave.start(s);
@@ -49,6 +49,7 @@ G.Core.game = {
     s.tick++; s.time = s.tick * h;
 
     G.Core.player.update(s, input, h);
+    if (s.playerShots.length) G.Core.skills.updateShots(s, h);
     for (var i = 0; i < s.enemies.length; i++) if (!s.enemies[i].dead) G.Core.enemy.update(s, s.enemies[i], h);
     s.enemies = s.enemies.filter(function (e) { return !e.dead; });
     G.Core.game.resolveBodies(s);
@@ -65,7 +66,7 @@ G.Core.game = {
       for (var i = 0; i < bodies.length; i++) {
         for (var j = i + 1; j < bodies.length; j++) {
           var a = bodies[i], b = bodies[j];
-          if (i === 0 && s.player.dashTime > 0) continue;   // 대시 중에는 적과 몸이 겹쳐도 통과(유령 상태)
+          if (i === 0 && (s.player.dashTime > 0 || s.player.rushTime > 0)) continue;   // 대시 중에는 적과 몸이 겹쳐도 통과(유령 상태)
           // 보스는 밀리지 않음. 겹치면 상대만 다 밀려남
           var wa = a.type === 'boss' ? 0 : 1, wb = b.type === 'boss' ? 0 : 1;
           if (wa + wb === 0) continue;
@@ -88,17 +89,18 @@ G.Core.game = {
   },
 
   onWaveClear: function (s) {
-    s.projectiles = [];
+    s.projectiles = []; s.playerShots = [];
     s.cardOffer = G.Core.cards.offer(s);
     s.phase = 'card';
     G.Core.emit(s, 'cardOffer', { offer: s.cardOffer.map(function (c) { return c.id + ':' + c.tier; }) });
   },
 
-  chooseCard: function (s, index) {
+  // slot: 스킬 카드면 넣을 칸(0 = S, 1 = D)
+  chooseCard: function (s, index, slot) {
     if (s.phase !== 'card' || !s.cardOffer[index]) return;
     var pick = s.cardOffer[index];
-    G.Core.cards.apply(s, pick);
-    G.Core.emit(s, 'cardPick', { id: pick.id, tier: pick.tier });
+    G.Core.cards.apply(s, pick, slot);
+    G.Core.emit(s, 'cardPick', slot === undefined ? { id: pick.id, tier: pick.tier } : { id: pick.id, tier: pick.tier, slot: slot });
     s.cardOffer = null;
     if (s.wave >= s.dt.common.wavesPerFloor) {
       s.phase = 'floor';                 // 층 전환 화면

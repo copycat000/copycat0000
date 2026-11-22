@@ -261,7 +261,7 @@
   }
 
   function renderCards(c) {
-    var list = G.DT.cards.list.filter(function (k) { return !k.requires; });
+    var list = G.DT.cards.list;   // 스킬이 생겨서 스킬 쿨감(C008)도 나옴(11/22)
     var h = '';
     LV.forEach(function (lv) {
       var a = c.runs.filter(function (r) { return r.level === lv; });

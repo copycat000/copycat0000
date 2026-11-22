@@ -120,6 +120,19 @@ G.Shapes = (function () {
         drawSprite(ctx, sp, p.x - p.dashDir.x * 20, p.y - p.dashDir.y * 20, p.r, right);
         ctx.globalAlpha = 1;
       }
+      if (p.rushTime > 0) {   // 돌진 베기 잔상(초록빛) + 베는 범위 원
+        for (var g = 1; g <= 3; g++) {
+          ctx.globalAlpha = 0.28 / g;
+          drawSprite(ctx, sp, p.x - p.rushDir.x * 18 * g, p.y - p.rushDir.y * 18 * g, p.r, right);
+        }
+        ctx.globalAlpha = 1;
+        ctx.strokeStyle = 'rgba(110,255,140,0.55)'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r + p.basicAttack.range, 0, Math.PI * 2); ctx.stroke();
+      }
+      if (p.skillInvulnTime > 0) {   // 무적 스킬: 금빛 막
+        ctx.fillStyle = 'rgba(255,215,90,0.18)'; ctx.strokeStyle = 'rgba(255,215,90,0.9)'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(p.x, p.y - p.r * 0.3, p.r * 1.7, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      }
       shadow(ctx, p.x, p.y, p.r);
       // 공격 방향 표시(그림은 좌우만 돌아서 위·아래·대각 공격 방향은 이걸로 봄)
       ctx.strokeStyle = C.facing; ctx.lineWidth = 3; ctx.globalAlpha = 0.8;
@@ -259,6 +272,31 @@ G.Shapes = (function () {
         ctx.beginPath(); ctx.arc(ev.x + Math.cos(a) * d, ev.y + Math.sin(a) * d, 6 * alpha + 2, 0, Math.PI * 2); ctx.fill();
       }
       ctx.globalAlpha = 1;
+    },
+
+    // 검기: 진행 방향으로 휜 초승달
+    playerShot: function (ctx, b) {
+      var a = Math.atan2(b.vy, b.vx), R = b.r * 1.6;
+      ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(a);
+      ctx.fillStyle = 'rgba(190,255,210,0.9)'; ctx.strokeStyle = 'rgba(110,255,140,0.9)'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(-R * 0.4, 0, R, -1.1, 1.1); ctx.arc(-R * 0.9, 0, R * 0.95, 0.9, -0.9, true); ctx.closePath();
+      ctx.fill(); ctx.stroke();
+      ctx.restore();
+    },
+    // 탄 지우기: 퍼지는 고리
+    skillClear: function (ctx, ev, alpha) {
+      var k = 1 - alpha;
+      ctx.strokeStyle = 'rgba(110,255,140,' + (0.8 * alpha) + ')'; ctx.lineWidth = 6 * alpha + 1;
+      ctx.beginPath(); ctx.arc(ev.x, ev.y, ev.r * (0.3 + 0.7 * k), 0, Math.PI * 2); ctx.stroke();
+    },
+    // 회복: 위로 올라가는 초록 십자
+    skillHeal: function (ctx, ev, alpha) {
+      var k = 1 - alpha;
+      ctx.fillStyle = 'rgba(123,216,143,' + alpha + ')';
+      for (var i = 0; i < 5; i++) {
+        var x = ev.x + (i - 2) * 12, y = ev.y - 20 - k * 40 - (i % 2) * 10;
+        ctx.fillRect(x - 2, y - 6, 4, 12); ctx.fillRect(x - 6, y - 2, 12, 4);
+      }
     },
 
     projectile: function (ctx, b) {

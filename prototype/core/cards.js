@@ -8,6 +8,7 @@ G.Core.cards = {
     for (var i = 0; i < list.length; i++) {
       var c = list[i];
       if (c.requires === 'skill' && !s.hasSkill) continue;
+      if (c.group === 'skill' && (s.noSkillCards || G.Core.skills.owns(s, c.skill))) continue;   // 봇은 스킬 쓰는 규칙이 아직 없어서 스킬 카드를 안 받음(대시보드 결과 유지)
       if (!c.stackable && s.pickedOnce[c.id]) continue;
       if (G.Core.cards.isMaxed(s, c)) continue;     // 이미 상한에 닿은 스탯 카드는 안 나옴
       out.push(c);
@@ -40,8 +41,15 @@ G.Core.cards = {
     return null;
   },
 
-  apply: function (s, pick) {
+  // slot: 스킬 카드일 때 넣을 칸(0 = S, 1 = D)
+  apply: function (s, pick, slot) {
     var c = G.Core.cards.find(s, pick.id), p = s.player;
+    if (c.group === 'skill') {
+      G.Core.skills.equip(s, slot === 1 ? 1 : 0, c.skill);
+      s.pickedOnce[c.id] = true;
+      s.picks.push({ id: c.id, tier: pick.tier, value: pick.value, floor: s.floor, wave: s.wave, slot: slot === 1 ? 1 : 0 });
+      return;
+    }
     var path = c.stat.split('.'), obj = p;
     for (var i = 0; i < path.length - 1; i++) obj = obj[path[i]];
     var key = path[path.length - 1];

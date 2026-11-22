@@ -16,10 +16,13 @@ G.Core.player = {
     p.hitInvulnTime = 0;
     p.regenTimer = 0;
     p.kbVx = 0; p.kbVy = 0; p.kbTime = 0;   // 맞고 밀려나는 중
+    p.skills = [null, null];   // S·D 칸: { id, cd }
+    p.skillInvulnTime = 0;     // 무적 스킬 남은 시간
+    p.rushTime = 0; p.rushDir = { x: 1, y: 0 }; p.rushHit = {}; p.rushMult = 1;   // 돌진 베기
     return p;
   },
 
-  isInvulnerable: function (p) { return p.dashTime > 0 || p.hitInvulnTime > 0; },
+  isInvulnerable: function (p) { return p.dashTime > 0 || p.hitInvulnTime > 0 || p.skillInvulnTime > 0; },
 
   basicCooldown: function (p) {
     var ba = p.basicAttack;
@@ -31,6 +34,7 @@ G.Core.player = {
     p.atkCd = Math.max(0, p.atkCd - h);
     p.dashCd = Math.max(0, p.dashCd - h);
     p.hitInvulnTime = Math.max(0, p.hitInvulnTime - h);
+    G.Core.skills.tick(s, h);
 
     // 맞고 밀려나는 중: 밀리는 거리만큼 움직이고, lockMove면 조작(이동·공격·대시) 전부 무시
     // 의도(타디온 11/20): 맞으면 끝까지 밀려야 피하든 파훼하든 하라는 압력이 생김
@@ -49,7 +53,7 @@ G.Core.player = {
     if (moving) p.facing = face;                               // 마지막 이동 방향 유지
 
     // 대시: 공격 중이어도 바로 나간다. 방향키 누르고 있으면 그 방향, 아니면 바라보는 방향
-    if (input.dash && p.dashCd <= 0 && p.dashTime <= 0) {
+    if (input.dash && p.dashCd <= 0 && p.dashTime <= 0 && p.rushTime <= 0) {
       p.dashDir = moving ? face : p.facing;
       p.facing = p.dashDir;
       p.dashTime = p.dash.invuln;
@@ -57,8 +61,17 @@ G.Core.player = {
       G.Core.emit(s, 'dash', { x: p.x, y: p.y });
     }
 
-    var vx, vy;
-    if (p.dashTime > 0) {
+    // 스킬: S = 1칸, D = 2칸
+    if (input.skill1) G.Core.skills.use(s, 0, moving ? face : { x: 0, y: 0 });
+    if (input.skill2) G.Core.skills.use(s, 1, moving ? face : { x: 0, y: 0 });
+
+    var vx, vy, rushing = false;
+    if (p.rushTime > 0) {          // 돌진 베기: 대시 속도로 미끄러짐. 방향키 이동은 무시
+      var rs = p.dash.distance / p.dash.invuln, rstep = Math.min(h, p.rushTime);
+      vx = p.rushDir.x * rs * rstep / h; vy = p.rushDir.y * rs * rstep / h;
+      p.rushTime = Math.max(0, p.rushTime - h);
+      rushing = true;
+    } else if (p.dashTime > 0) {
       var spd = p.dash.distance / p.dash.invuln;
       var step = Math.min(h, p.dashTime);
       vx = p.dashDir.x * spd * step / h; vy = p.dashDir.y * spd * step / h;
@@ -67,6 +80,10 @@ G.Core.player = {
       vx = dir.x * p.moveSpeed; vy = dir.y * p.moveSpeed;
     }
     p.x += vx * h; p.y += vy * h;
+    if (rushing) {
+      p.x = Math.max(p.r, Math.min(s.map.width - p.r, p.x)); p.y = Math.max(p.r, Math.min(s.map.height - p.r, p.y));
+      G.Core.skills.rushHits(s);
+    }
 
     // 기본 공격: 누른 순간 한 번 판정. 대시 중에도 가능
     if (input.attack && p.atkCd <= 0) {
@@ -124,6 +141,7 @@ G.Core.player = {
     if (dir && kb.distance > 0 && m > 0) {
       p.kbVx = dir.x * kb.distance * m / kb.time; p.kbVy = dir.y * kb.distance * m / kb.time; p.kbTime = kb.time;
       p.dashTime = 0;       // 대시 중엔 무적이라 여기 안 옴. 안전하게 끊어둠
+      p.rushTime = 0;       // 돌진 베기는 무적이 아니라 맞으면 끊김
     }
     G.Core.emit(s, 'playerHit', { dmg: dmg, source: sourceId, attack: attack || null, hp: p.hp, kbMult: m });
     if (p.hp <= 0) { p.hp = 0; G.Core.game.onDeath(s); }

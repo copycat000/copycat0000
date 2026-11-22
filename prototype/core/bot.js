@@ -161,7 +161,8 @@ G.Core.bot = {
   // ---- 매 틱 입력 만들기 ----
   think: function (bot, s) {
     var B = G.Core.bot, p = s.player, geom = G.Core.geom;
-    var input = { moveX: 0, moveY: 0, faceX: 0, faceY: 0, attack: false, dash: false, skill1: false, skill2: false };
+    var sk = s.player.skills;   // 스킬은 쿨타임이 돌면 바로 씀(임시 규칙, 타디온 11/22)
+    var input = { moveX: 0, moveY: 0, faceX: 0, faceY: 0, attack: false, dash: false, skill1: !!(sk[0] && sk[0].cd <= 0), skill2: !!(sk[1] && sk[1].cd <= 0) };
     B.readLog(bot, s);
     B.refresh(bot, s);
 
@@ -245,6 +246,11 @@ G.Core.bot = {
   },
 
   pickCard: function (bot, s) { return bot.rng.int(s.cardOffer.length); },
+  // 스킬 카드면 넣을 칸도 무작위(0 = S, 1 = D). 스킬 카드가 아니면 undefined
+  pickSlot: function (bot, s, index) {
+    var c = G.Core.cards.find(s, s.cardOffer[index].id);
+    return c.group === 'skill' ? bot.rng.int(2) : undefined;
+  },
 
   // 판이 끝났나: 'death' / 'clear' / 'timeout' / null
   checkEnd: function (bot, s) {
@@ -297,7 +303,7 @@ G.Core.bot = {
       end = G.Core.bot.checkEnd(bot, s);
       if (end) break;
       if (s.phase === 'combat') G.Core.game.step(s, G.Core.bot.think(bot, s));
-      else if (s.phase === 'card') G.Core.game.chooseCard(s, G.Core.bot.pickCard(bot, s));
+      else if (s.phase === 'card') { var ci = G.Core.bot.pickCard(bot, s); G.Core.game.chooseCard(s, ci, G.Core.bot.pickSlot(bot, s, ci)); }
       else if (s.phase === 'floor') G.Core.game.nextFloor(s);
     }
     return G.Core.bot.finish(bot, s, end);
