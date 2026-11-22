@@ -82,16 +82,21 @@ G.UI = (function () {
     card: function (ctx, s, sel) {
       dim(ctx, s);
       text(ctx, (isBossWave(s) ? '보스 처치' : '웨이브 ' + s.wave + ' 클리어') + ' · 카드 한 장을 고르세요', s.W / 2, 150, 26, '#e8eaf0', 'center');
-      var w = 260, h = 300, gap = 40, x0 = s.W / 2 - (w * 3 + gap * 2) / 2;
+      var w = 260, h = 350, gap = 40, x0 = s.W / 2 - (w * 3 + gap * 2) / 2;
       for (var i = 0; i < s.cardOffer.length; i++) {
-        var pick = s.cardOffer[i], c = G.Core.cards.find(s, pick.id), x = x0 + i * (w + gap), y = 220;
+        var pick = s.cardOffer[i], c = G.Core.cards.find(s, pick.id), x = x0 + i * (w + gap), y = 195;
         ctx.fillStyle = '#23262e'; ctx.fillRect(x, y, w, h);
         ctx.strokeStyle = i === sel ? '#4da3ff' : '#3a3f4b'; ctx.lineWidth = i === sel ? 4 : 2; ctx.strokeRect(x, y, w, h);
-        text(ctx, c.group === 'basic' ? '기본 공격 강화' : '능력치', x + w / 2, y + 36, 14, '#8a90a0', 'center');
-        text(ctx, c.name || c.label, x + w / 2, y + 110, 26, '#e8eaf0', 'center');
-        text(ctx, effectText(c, pick.value), x + w / 2, y + 156, 20, '#7bd88f', 'center');
-        text(ctx, pick.tier + '단계', x + w / 2, y + 220, 16, ['#b9bfcc', '#6fb3ff', '#ffcf66'][pick.tier - 1], 'center');
-        text(ctx, '[' + (i + 1) + ']', x + w / 2, y + h - 28, 16, '#8a90a0', 'center');
+        text(ctx, c.group === 'basic' ? '기본 공격 강화' : '능력치', x + w / 2, y + 22, 13, '#8a90a0', 'center');
+        // 카드 그림 자리(임시). 그림이 생기면 여기에 그림
+        var ix = x + 24, iy = y + 40, iw = w - 48, ih = 140;
+        ctx.fillStyle = '#1a1c22'; ctx.fillRect(ix, iy, iw, ih);
+        ctx.strokeStyle = '#3a3f4b'; ctx.lineWidth = 1.5; ctx.setLineDash([6, 5]); ctx.strokeRect(ix, iy, iw, ih); ctx.setLineDash([]);
+        text(ctx, '카드 그림 자리', x + w / 2, iy + ih / 2, 13, '#4a4f5c', 'center');
+        text(ctx, c.name || c.label, x + w / 2, y + 212, 24, '#e8eaf0', 'center');
+        text(ctx, effectText(c, pick.value), x + w / 2, y + 248, 18, '#7bd88f', 'center');
+        text(ctx, pick.tier + '단계', x + w / 2, y + 285, 15, ['#b9bfcc', '#6fb3ff', '#ffcf66'][pick.tier - 1], 'center');
+        text(ctx, '[' + (i + 1) + ']', x + w / 2, y + h - 22, 15, '#8a90a0', 'center');
       }
     },
 
