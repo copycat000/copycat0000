@@ -20,7 +20,9 @@ G.Sound = (function () {
     var AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
     if (!ac) {
-      ac = new AC(); master = ac.createGain(); master.connect(ac.destination); applyGain();
+      ac = new AC(); master = ac.createGain(); applyGain();
+      var comp = ac.createDynamicsCompressor(); comp.threshold.value = -10; comp.ratio.value = 6;   // 여러 소리가 겹쳐 커져도 찢어지지 않게
+      master.connect(comp); comp.connect(ac.destination);
       noiseBuf = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate);
       var d = noiseBuf.getChannelData(0);
       for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
@@ -102,11 +104,14 @@ G.Sound = (function () {
 
   // 콘셉트 기획서 '소리' 표 그대로. 크기는 들리는 순서(예고 > 플레이어 피격 > 공격·적 피격 > 나머지)에 맞춤
   var SFX = {
-    swing: function () { noise('bandpass', 3800, 600, 0.15, 0.4, { q: 1.4, peak: 0.35 }); },          // 칼 휘두르는 휙: 잡음이 높은 쪽에서 낮은 쪽으로 빠르게
+    swing: function (ev) {                                                                              // 칼 휘두르는 휙. 맞혔으면 휙을 크게 줄여서 퍽이 앞에 나오게, 헛스윙일 때만 원래 크기
+      noise('bandpass', 3800, 600, 0.15, ev.hits > 0 ? 0.1 : 0.4, { q: 1.4, peak: 0.35 });
+    },
     dash: function () { noise('bandpass', 2600, 1400, 0.09, 0.2, { q: 0.7, peak: 0.3 }); },            // 슉: 휙보다 부드럽고 짧게
-    enemyHit: function (ev) {                                                                           // 흔한 타격음 퍽: 낮은 음 짧게 + 잡음 살짝. 치명타는 더 크게
-      var k = ev.crit ? 1.5 : 1;
-      tone('sine', 140, 50, 0.07, 0.42 * k); noise('lowpass', 1600, 250, 0.05, 0.22 * k);
+    enemyHit: function (ev) {                                                                           // 따닥(짧고 단단한 앞소리) + 낮고 묵직한 울림. 휙보다 확실히 크게. 치명타는 더 크고 울림 길게
+      var k = ev.crit ? 1.35 : 1, len = ev.crit ? 0.3 : 0.18;
+      noise('bandpass', 2600, 1800, 0.02, 0.55 * k, { q: 1.5 }); tone('square', 900, 260, 0.025, 0.2 * k, { lp: 3000 });
+      tone('sine', 115, 42, len, 0.75 * k); noise('lowpass', 900, 140, len * 0.7, 0.35 * k);
     },
     enemyDie: function () { tone('sine', 130, 38, 0.28, 0.28); noise('lowpass', 700, 120, 0.22, 0.12); },   // 질척하게 꺼짐
     playerHit: function () {                                                                            // 같은 퍽인데 더 낮고 묵직하게, 더 크게
