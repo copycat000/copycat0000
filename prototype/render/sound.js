@@ -51,7 +51,7 @@ G.Sound = (function () {
     var t = ac.currentTime + (o.delay || 0), src = ac.createBufferSource(), bq = ac.createBiquadFilter(), g = ac.createGain();
     src.buffer = noiseBuf; bq.type = filter; bq.Q.value = o.q || 1;
     bq.frequency.setValueAtTime(f0, t); bq.frequency.exponentialRampToValueAtTime(f1, t + dur);
-    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(gain, t + Math.min(0.01, dur * 0.3)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(gain, t + (o.peak ? dur * o.peak : Math.min(0.01, dur * 0.3)));   // o.peak: 가장 커지는 지점(길이 대비) g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     src.connect(bq); bq.connect(g); g.connect(master); src.start(t); src.stop(t + dur + 0.05);
   }
 
@@ -102,15 +102,15 @@ G.Sound = (function () {
 
   // 콘셉트 기획서 '소리' 표 그대로. 크기는 들리는 순서(예고 > 플레이어 피격 > 공격·적 피격 > 나머지)에 맞춤
   var SFX = {
-    swing: function () { noise('bandpass', 500, 1500, 0.07, 0.3, { q: 1.5 }); },                       // 짧게 바람 가르는 소리
-    dash: function () { noise('bandpass', 350, 900, 0.1, 0.16, { q: 0.8 }); },                         // 공격보다 가벼운 휙
-    enemyHit: function (ev) {                                                                           // 둔탁한 퍽. 치명타는 더 크고 날카롭게
-      tone('sine', 160, 55, 0.09, 0.4); noise('lowpass', 900, 200, 0.04, 0.18);
-      if (ev.crit) { tone('triangle', 520, 140, 0.11, 0.3); noise('bandpass', 2200, 900, 0.05, 0.18, { q: 2 }); }
+    swing: function () { noise('bandpass', 3800, 600, 0.15, 0.4, { q: 1.4, peak: 0.35 }); },          // 칼 휘두르는 휙: 잡음이 높은 쪽에서 낮은 쪽으로 빠르게
+    dash: function () { noise('bandpass', 2600, 1400, 0.09, 0.2, { q: 0.7, peak: 0.3 }); },            // 슉: 휙보다 부드럽고 짧게
+    enemyHit: function (ev) {                                                                           // 흔한 타격음 퍽: 낮은 음 짧게 + 잡음 살짝. 치명타는 더 크게
+      var k = ev.crit ? 1.5 : 1;
+      tone('sine', 140, 50, 0.07, 0.42 * k); noise('lowpass', 1600, 250, 0.05, 0.22 * k);
     },
     enemyDie: function () { tone('sine', 130, 38, 0.28, 0.28); noise('lowpass', 700, 120, 0.22, 0.12); },   // 질척하게 꺼짐
-    playerHit: function () {                                                                            // 거칠고 묵직하게, 적 맞는 소리보다 크게
-      tone('sawtooth', 120, 45, 0.24, 0.5, { lp: 1300 }); tone('square', 70, 40, 0.18, 0.25, { lp: 600 }); noise('lowpass', 1600, 300, 0.12, 0.35);
+    playerHit: function () {                                                                            // 같은 퍽인데 더 낮고 묵직하게, 더 크게
+      tone('sine', 90, 32, 0.16, 0.65); tone('square', 60, 35, 0.12, 0.18, { lp: 350 }); noise('lowpass', 900, 140, 0.11, 0.45);
     },
     telegraph: function (ev, s) {
       if (ev.pattern === 'charge') {                                                                    // 예고 동안 점점 높아지고 커짐
@@ -119,7 +119,9 @@ G.Sound = (function () {
       } else if (ev.pattern === 'slam') tone('square', 200, 170, 0.4, 0.3, { lp: 1100 });              // 일반 예고보다 낮고 길게
       else tone('square', 330, 300, 0.12, 0.26, { lp: 1600 });                                         // 짧고 낮은 경고음 한 번
     },
-    enemyFire: function () { tone('sine', 700, 260, 0.07, 0.14); },                                    // 작은 퓻
+    enemyFire: function () {                                                                            // 활시위 퉁 + 화살 쉭. 맑은 사인 단음은 안 씀
+      tone('triangle', 190, 150, 0.12, 0.22, { lp: 900 }); noise('bandpass', 4500, 2200, 0.16, 0.1, { q: 1, peak: 0.4, delay: 0.02 });
+    },
     bossBreak: function () {                                                                            // 크게 깨지는 소리, 가장 시원하게
       stopCharge();
       noise('lowpass', 4000, 300, 0.6, 0.55); tone('sine', 220, 45, 0.5, 0.55); tone('triangle', 700, 160, 0.3, 0.25);
