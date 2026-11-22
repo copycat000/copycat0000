@@ -47,6 +47,7 @@ G.UI = (function () {
         ctx.strokeStyle = '#4a4f5c'; ctx.lineWidth = 2; ctx.strokeRect(146 + i * 34, 44, 28, 28);
         text(ctx, i === 0 ? 'S' : 'D', 160 + i * 34, 58, 12, '#6b7180', 'center');
       }
+      if (G.Sound) text(ctx, 'M 소리 ' + (G.Sound.isOn() ? '켜짐' : '꺼짐'), 222, 58, 12, G.Sound.isOn() ? '#8a90a0' : '#6b7180');
 
       text(ctx, (s.infinite ? '무한 · ' : '') + s.floor + '층 ' + floorName(s, s.floor) + '  웨이브 ' + s.wave + ' / ' + s.dt.common.wavesPerFloor + (isBossWave(s) ? ' (보스)' : ''), s.W - 20, 27, 18, '#e8eaf0', 'right');
 
@@ -72,7 +73,7 @@ G.UI = (function () {
     start: function (ctx, s) {
       dim(ctx, s);
       text(ctx, '가라앉는 늪', s.W / 2, s.H / 2 - 80, 44, '#e8eaf0', 'center');
-      text(ctx, '방향키 이동   A 공격   Space 대시   S·D 스킬(첫 판은 빈칸)   P 일시정지', s.W / 2, s.H / 2 - 10, 20, '#b9bfcc', 'center');
+      text(ctx, '방향키 이동   A 공격   Space 대시   S·D 스킬(첫 판은 빈칸)   P 일시정지   M 소리', s.W / 2, s.H / 2 - 10, 20, '#b9bfcc', 'center');
       text(ctx, '카드 고르기: 1·2·3 또는 ←→ 후 Enter', s.W / 2, s.H / 2 + 24, 16, '#8a90a0', 'center');
       text(ctx, '5번째 웨이브는 보스. 시작 화면에서 5 를 누르면 바로 보스부터', s.W / 2, s.H / 2 + 50, 14, '#6b7180', 'center');
       text(ctx, 'Enter 를 눌러 시작', s.W / 2, s.H / 2 + 90, 22, '#4da3ff', 'center');

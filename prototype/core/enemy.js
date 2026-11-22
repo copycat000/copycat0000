@@ -86,6 +86,8 @@ G.Core.enemy = {
       r: def.projectileDiameter / 2, damage: def.damage, source: e.defId,
       owner: e.uid           // 쏜 적(봇이 어느 예고에서 나온 탄인지 알아보려고. 규칙엔 안 씀)
     });
+    // 발사 소리용 사건. 화면 쪽에만 넘기고 기록(s.log)에는 안 남김(로그 항목·대시보드 결과가 안 바뀌게)
+    s.events.push({ t: Math.round(s.time * 1000) / 1000, type: 'enemyFire', uid: e.uid, floor: s.floor, wave: s.wave });
   },
 
   // 적 중심에서 플레이어 쪽(= 플레이어가 밀려날 방향)

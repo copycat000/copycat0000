@@ -78,7 +78,7 @@
 
   // ---- 입력 ----
   var held = {}, pressed = {};
-  var KEYS = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyA', 'KeyS', 'KeyD', 'Enter', 'Digit1', 'Digit2', 'Digit3', 'Digit5', 'Space', 'KeyP', 'Escape', 'KeyT', 'KeyB', 'KeyH', 'KeyK', 'KeyL'];
+  var KEYS = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyA', 'KeyS', 'KeyD', 'Enter', 'Digit1', 'Digit2', 'Digit3', 'Digit5', 'Space', 'KeyP', 'Escape', 'KeyT', 'KeyB', 'KeyH', 'KeyK', 'KeyL', 'KeyM'];
   window.addEventListener('keydown', function (e) {
     if (e.target && /^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) return;   // 아래 봇 입력칸에 숫자 칠 때는 게임 키로 안 받음
     if (KEYS.indexOf(e.code) >= 0) e.preventDefault();
@@ -115,6 +115,7 @@
     G.lastRun = s;
     bot = null;
     if (botLevel) { bot = G.Core.bot.create(s, botLevel); botPick = -1; botFloorAt = -1; G.lastBot = bot; }
+    if (G.Sound) { G.Sound.unlock(); G.Sound.stopLoops(); }   // 시작할 때 소리를 처음 켬(브라우저가 입력 전 소리를 막아서). 시작 화면은 무음
     console.log('[run] seed =', seed, ' (같은 판 다시 보기: ?seed=' + seed + ')');
     screen = 'play';
   }
@@ -122,7 +123,7 @@
   // P·Esc를 누르면 일시정지를 켜고 끔. 지금 멈춰 있으면 true
   function togglePause() {
     var p = take('KeyP'), e = take('Escape');
-    if (p || e) paused = !paused;
+    if (p || e) { paused = !paused; if (paused && G.Sound) G.Sound.stopLoops(); }
     return paused;
   }
 
@@ -141,6 +142,8 @@
     if (take('KeyL') && !botLevel) LOCKMOVE_ON = !LOCKMOVE_ON;
     if (s) s.player.hitKnockback.lockMove = LOCKMOVE_ON;
     if (s) s.player.basicAttack.knockback = KNOCKBACK_ON ? G.DT.player.basicAttack.knockback : 0;   // 넉백은 규칙이라 DT 값을 켜고 끔
+    if (take('KeyM') && G.Sound) G.Sound.toggle();   // M: 소리 켜기/끄기
+    if (G.Sound) G.Sound.showPanel(screen === 'start');
     if (screen === 'start') {
       if (botLevel) newRun();
       else if (take('Enter')) newRun();
@@ -235,6 +238,7 @@
     // 규칙 쪽에서 나온 이벤트 중 그림이 필요한 것만 가져감
     for (var i = 0; i < s.events.length; i++) {
       var ev = s.events[i];
+      if (G.Sound) G.Sound.play(ev, s);
       if (EFFECT_LIFE[ev.type]) {
         // 맞힌 공격은 궤적이 다 그려진 순간에서 멈추도록 시작점을 당겨둠
         var born = (ev.type === 'swing' && ev.hits > 0 && HITSTOP_ON) ? fxNow - EFFECT_LIFE.swing * 0.45 : fxNow;
@@ -251,6 +255,7 @@
       if (ev.type === 'enemyDie') effects.push({ ev: { type: 'deathPuff', x: ev.x, y: ev.y }, born: fxNow, life: EFFECT_LIFE.deathPuff });
     }
     s.events.length = 0; scanned = 0;
+    if (G.Sound) G.Sound.tick(s, !paused);
 
     // 화면 진동: 그림 전체를 살짝 흔듦(HUD는 제외)
     var shook = shakeLeft > 0;

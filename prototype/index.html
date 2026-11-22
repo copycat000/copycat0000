@@ -12,10 +12,22 @@
   .botbar select, .botbar input, .botbar button { font: inherit; color: #e8eaf0; background: #17191f; border: 1px solid #2b2f39; border-radius: 6px; padding: 3px 8px; }
   .botbar input { width: 110px; }
   .botbar a { color: #4da3ff; }
+  .stage { position: relative; }
+  .soundbox { position: absolute; left: 50%; top: 72%; transform: translateX(-50%); gap: 14px; align-items: center; color: #b9bfcc; font-size: 14px; }
+  .soundbox button { font: inherit; color: #e8eaf0; background: #23262e; border: 1px solid #3a3f4b; border-radius: 6px; padding: 5px 12px; cursor: pointer; }
+  .soundbox button[aria-pressed="false"] { color: #8a90a0; }
+  .soundbox label { display: flex; gap: 8px; align-items: center; }
+  .soundbox input { width: 140px; accent-color: #4da3ff; }
 </style>
 </head>
 <body>
+<div class="stage">
 <canvas id="game" tabindex="0"></canvas>
+<div id="soundBox" class="soundbox" style="display:none">
+  <button type="button" aria-pressed="true">소리 켜짐</button>
+  <label>볼륨 <input type="range" min="0" max="100" step="1" aria-label="볼륨"></label>
+</div>
+</div>
 <div class="botbar">
   봇 다시 보기
   <select id="botLv"><option value="skilled">숙련</option><option value="mid">중간</option><option value="novice">초보</option></select>
@@ -36,6 +48,7 @@
 <script src="data/skills.js"></script>
 <script src="data/env.js"></script>
 <script src="data/bots.js"></script>
+<script src="data/sound.js"></script>
 
 <!-- 규칙 계산(화면과 분리) -->
 <script src="core/rng.js"></script>
@@ -51,6 +64,7 @@
 <!-- 그리기 -->
 <script src="render/shapes.js"></script>
 <script src="render/ui.js"></script>
+<script src="render/sound.js"></script>
 <script src="main.js"></script>
 <script>
   (function () {

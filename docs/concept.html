@@ -204,6 +204,107 @@ code{font-size:13px;background:var(--th);padding:1px 4px;border-radius:4px}
 <li>환경 조건: 늪이 공간을 바꾸는 모습 (예: 횟불이 꺼짐, 바닥이 물듬)</li>
 </ul>
 <p>다른 파트는 이름을 새로 만들지 않고 이 문서의 이름을 쓴다.</p>
+<h2>소리</h2>
+<p>소리는 낮고 둔탁하게 간다. 맑고 반짝이는 고음은 쓰지 않고, 늪에 잠긴 것처럼 먹먹하고 질척한 소리를 기본으로 한다. 단, 예고와 피격은 분위기보다 잘 들리는 것이 먼저다.</p>
+<p>효과음은 소리 파일 없이 브라우저 기본 기능(Web Audio)으로 코드에서 만든다. 그래서 모두 단순한 합성음(사인파, 짧은 잡음, 음높이 미끄러짐) 안에서 잡는다.</p>
+<p><strong>규칙</strong></p>
+<ul>
+<li>소리는 화면 쪽에서만 낸다. 규칙 계산(core)은 건드리지 않고, 봇 대량 실행과 대시보드 시뮬에서는 소리가 나지 않는다</li>
+<li>들리는 순서: 예고 &gt; 플레이어 피격 &gt; 공격·적 피격 &gt; 나머지. 앞의 것이 더 크고 뚜렷하게 들려야 한다</li>
+<li>적 여러 마리가 동시에 같은 소리를 내면 아주 짧은 간격 안에서는 한 번만 낸다. 간격 값은 구현하면서 맞춘다</li>
+<li>켜기·끄기와 볼륨은 시스템 파트에서 정한다</li>
+</ul>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>상황</th>
+<th>프로토 이벤트</th>
+<th>소리 느낌</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>플레이어 기본 공격</td>
+<td>swing</td>
+<td>짧게 바람 가르는 소리. 잡음을 아주 짧게</td>
+</tr>
+<tr>
+<td>대시</td>
+<td>dash</td>
+<td>공격보다 가벼운 휘하는 소리</td>
+</tr>
+<tr>
+<td>적이 맞음</td>
+<td>enemyHit</td>
+<td>둔탁한 퍽. 치명타는 조금 더 크고 날카롭게</td>
+</tr>
+<tr>
+<td>적 쓰러짐</td>
+<td>enemyDie</td>
+<td>질척하게 꺼지는 소리. 낮은 음이 아래로 미끄러짐</td>
+</tr>
+<tr>
+<td>플레이어가 맞음</td>
+<td>playerHit</td>
+<td>거칠고 묵직한 소리. 적이 맞는 소리와 확실히 다르고 더 크게</td>
+</tr>
+<tr>
+<td>일반 적 예고</td>
+<td>telegraph</td>
+<td>짧고 낮은 경고음 한 번</td>
+</tr>
+<tr>
+<td>원거리형 발사</td>
+<td>(없음, 아래 참고)</td>
+<td>작은 퓻</td>
+</tr>
+<tr>
+<td>보스 휘두르기 예고</td>
+<td>telegraph(slam)</td>
+<td>일반 예고보다 낮고 길게</td>
+</tr>
+<tr>
+<td>보스 돌진 예고</td>
+<td>telegraph(charge)</td>
+<td>예고 동안 점점 높아지고 커지는 소리. 깨야 할 게이지가 있다는 걸 소리로도 알림</td>
+</tr>
+<tr>
+<td>보스 파훼</td>
+<td>bossBreak</td>
+<td>크게 깨지는 소리. 가장 시원하게</td>
+</tr>
+<tr>
+<td>보스 벽 충돌</td>
+<td>bossWall</td>
+<td>둔탁한 쿤</td>
+</tr>
+<tr>
+<td>카드 나옴 / 고름</td>
+<td>cardOffer / cardPick</td>
+<td>낮은 웅. 고를 때는 낮은 음 두 개가 겹쳐서 스며드는 느낌</td>
+</tr>
+<tr>
+<td>웨이브 클리어</td>
+<td>waveClear</td>
+<td>짧고 낮은 화음</td>
+</tr>
+<tr>
+<td>층 클리어</td>
+<td>floorClear</td>
+<td>더 길게, 아래로 내려가는 음. 가라앉는 느낌</td>
+</tr>
+<tr>
+<td>무한 모드 시작(문 너머)</td>
+<td>infiniteStart</td>
+<td>문이 열리는 낮은 울림</td>
+</tr>
+<tr>
+<td>죽음</td>
+<td>death</td>
+<td>길게 가라앉는 소리</td>
+</tr>
+</tbody></table></div>
+<p>원거리형 발사는 지금 프로토에 따로 나오는 이벤트가 없다. 소리를 넣으려면 발사 순간을 알리는 이벤트를 추가하되, 규칙 계산은 바꾸지 않는다.</p>
+<p>배경음은 시간이 남으면 넣는다. 넣는다면 낮게 웅웅거리는 지속음 하나로, 층이 깊어질수록 음이 조금씩 낮아지게 해서 층마다 어두워지는 바닥과 맞춘다.</p>
 <div class="pn"><span></span><span><a href="overview.html">통합 기획서 – 큰 틀 →</a></span></div>
 </main>
 </body>
