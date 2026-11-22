@@ -2,6 +2,7 @@
 var G = globalThis.G = globalThis.G || {};
 
 G.UI = (function () {
+  var CARD_COLOR = { survive: '#00aeef', attack: '#ec008c', basic: '#fff200' };   // 인쇄 CMYK 원색에 가까운 값
   var FONT = '"Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif';
 
   function text(ctx, str, x, y, size, color, align) {
@@ -90,9 +91,9 @@ G.UI = (function () {
         text(ctx, c.group === 'basic' ? '기본 공격 강화' : '능력치', x + w / 2, y + 22, 13, '#8a90a0', 'center');
         // 카드 그림 자리(임시). 그림이 생기면 여기에 그림
         var ix = x + 24, iy = y + 40, iw = w - 48, ih = 140;
-        ctx.fillStyle = '#1a1c22'; ctx.fillRect(ix, iy, iw, ih);
-        ctx.strokeStyle = '#3a3f4b'; ctx.lineWidth = 1.5; ctx.setLineDash([6, 5]); ctx.strokeRect(ix, iy, iw, ih); ctx.setLineDash([]);
-        text(ctx, '카드 그림 자리', x + w / 2, iy + ih / 2, 13, '#4a4f5c', 'center');
+        // 종류별 색: 시안 생존, 마젠타 공격, 옐로 평타(CMYK에서 검정 뺀 세 색)
+        ctx.fillStyle = CARD_COLOR[c.color] || '#1a1c22'; ctx.fillRect(ix, iy, iw, ih);
+        text(ctx, '카드 그림 자리', x + w / 2, iy + ih / 2, 13, 'rgba(0,0,0,0.45)', 'center');
         text(ctx, c.name || c.label, x + w / 2, y + 212, 24, '#e8eaf0', 'center');
         text(ctx, effectText(c, pick.value), x + w / 2, y + 248, 18, '#7bd88f', 'center');
         text(ctx, pick.tier + '단계', x + w / 2, y + 285, 15, ['#b9bfcc', '#6fb3ff', '#ffcf66'][pick.tier - 1], 'center');
