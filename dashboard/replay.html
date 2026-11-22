@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>봇 다시 보기</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0d0e11; }
+  body { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #b9bfcc; font: 13px system-ui, "Malgun Gothic", sans-serif; }
+  canvas { width: min(100vw, calc((100vh - 48px) * 16 / 9)); height: auto; aspect-ratio: 16 / 9; display: block; outline: none; }
+  .botbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; padding: 0 16px; }
+  .botbar select, .botbar input, .botbar button { font: inherit; color: #e8eaf0; background: #17191f; border: 1px solid #2b2f39; border-radius: 6px; padding: 3px 8px; }
+  .botbar input { width: 110px; }
+  .botbar a { color: #4da3ff; }
+</style>
+</head>
+<body>
+<canvas id="game" tabindex="0"></canvas>
+<div class="botbar">
+  봇 다시 보기
+  <select id="botLv"><option value="skilled">숙련</option><option value="mid">중간</option><option value="novice">초보</option></select>
+  시드 <input id="botSeed" type="number" min="0" value="1">
+  <button id="botGo">보기</button>
+  <button id="humanGo">사람이 하기</button>
+  · <a href="index.html">대시보드로</a> <span id="condTxt"></span>
+</div>
+
+<!-- DT 데이터 -->
+<script src="../prototype/data/common.js"></script>
+<script src="../prototype/data/player.js"></script>
+<script src="../prototype/data/enemies.js"></script>
+<script src="../prototype/data/cards.js"></script>
+<script src="../prototype/data/bosses.js"></script>
+<script src="../prototype/data/maps.js"></script>
+<script src="../prototype/data/skills.js"></script>
+<script src="../prototype/data/env.js"></script>
+<script src="../prototype/data/bots.js"></script>
+
+<!-- 대시보드 조건 덮어쓰기: 주소의 값(crit, dashCd …)을 DT 복사본에 넣고 게임이 그걸 쓰게 함. 프로토타입 파일은 그대로 -->
+<script src="sim.js"></script>
+<script>
+  (function () {
+    var q = new URLSearchParams(location.search), S = G.Dash.sim, k = S.docKnobs(), ch = [];
+    S.KNOBS.forEach(function (d) { if (q.has(d.id)) { var v = parseFloat(q.get(d.id)); if (!isNaN(v)) k[d.id] = v; } if (Math.abs(k[d.id] - d.doc) > 1e-9) ch.push(d.label + ' ' + k[d.id] + d.unit); });
+    G.DT = S.makeDT(G.DT, k);
+    document.getElementById('condTxt').textContent = '· 조건: ' + (ch.length ? ch.join(', ') : '문서 값');
+  })();
+</script>
+<!-- 규칙 계산(화면과 분리) -->
+<script src="../prototype/core/rng.js"></script>
+<script src="../prototype/core/geom.js"></script>
+<script src="../prototype/core/player.js"></script>
+<script src="../prototype/core/enemy.js"></script>
+<script src="../prototype/core/boss.js"></script>
+<script src="../prototype/core/wave.js"></script>
+<script src="../prototype/core/cards.js"></script>
+<script src="../prototype/core/game.js"></script>
+<script src="../prototype/core/bot.js"></script>
+
+<!-- 그리기 -->
+<script src="../prototype/render/shapes.js"></script>
+<script src="../prototype/render/ui.js"></script>
+<script src="../prototype/main.js"></script>
+<script>
+  (function () {
+    var c = document.getElementById('game');
+    c.addEventListener('click', function () { c.focus(); }); c.focus();
+    document.getElementById('botGo').onclick = function () { G.botReplay(document.getElementById('botLv').value, parseInt(document.getElementById('botSeed').value, 10) || 0); c.focus(); };
+    document.getElementById('humanGo').onclick = function () { G.humanPlay(); c.focus(); };
+  })();
+</script>
+</body>
+</html>

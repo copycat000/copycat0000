@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>첫 테스트 판</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0d0e11; }
+  body { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #b9bfcc; font: 13px system-ui, "Malgun Gothic", sans-serif; }
+  canvas { width: min(100vw, calc((100vh - 48px) * 16 / 9)); height: auto; aspect-ratio: 16 / 9; display: block; outline: none; }
+  .botbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; padding: 0 16px; }
+  .botbar select, .botbar input, .botbar button { font: inherit; color: #e8eaf0; background: #17191f; border: 1px solid #2b2f39; border-radius: 6px; padding: 3px 8px; }
+  .botbar input { width: 110px; }
+  .botbar a { color: #4da3ff; }
+</style>
+</head>
+<body>
+<canvas id="game" tabindex="0"></canvas>
+<div class="botbar">
+  봇 다시 보기
+  <select id="botLv"><option value="skilled">숙련</option><option value="mid">중간</option><option value="novice">초보</option></select>
+  시드 <input id="botSeed" type="number" min="0" value="1">
+  <button id="botGo">보기</button>
+  <button id="humanGo">사람이 하기</button>
+  · <a href="bot.html">대량 실행</a>
+</div>
+
+<!-- DT 데이터 -->
+<script src="data/common.js"></script>
+<script src="data/player.js"></script>
+<script src="data/enemies.js"></script>
+<script src="data/cards.js"></script>
+<script src="data/bosses.js"></script>
+<script src="data/maps.js"></script>
+<script src="data/skills.js"></script>
+<script src="data/env.js"></script>
+<script src="data/bots.js"></script>
+
+<!-- 규칙 계산(화면과 분리) -->
+<script src="core/rng.js"></script>
+<script src="core/geom.js"></script>
+<script src="core/player.js"></script>
+<script src="core/enemy.js"></script>
+<script src="core/boss.js"></script>
+<script src="core/wave.js"></script>
+<script src="core/cards.js"></script>
+<script src="core/game.js"></script>
+<script src="core/bot.js"></script>
+
+<!-- 그리기 -->
+<script src="render/shapes.js"></script>
+<script src="render/ui.js"></script>
+<script src="main.js"></script>
+<script>
+  (function () {
+    var c = document.getElementById('game');
+    c.addEventListener('click', function () { c.focus(); }); c.focus();
+    document.getElementById('botGo').onclick = function () { G.botReplay(document.getElementById('botLv').value, parseInt(document.getElementById('botSeed').value, 10) || 0); c.focus(); };
+    document.getElementById('humanGo').onclick = function () { G.humanPlay(); c.focus(); };
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>봇 실행</title>
+<style>
+  :root { --bg: #0d0e11; --panel: #17191f; --line: #2b2f39; --text: #e8eaf0; --sub: #8a90a0; --accent: #4da3ff; --warn: #ffcf66; --bad: #ff7a7a; --good: #7bd88f; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.6 system-ui, -apple-system, "Malgun Gothic", sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 24px 16px 60px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 16px; margin: 0 0 10px; }
+  p.sub { color: var(--sub); margin: 0 0 20px; }
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  label { display: inline-flex; gap: 6px; align-items: center; margin: 0 14px 8px 0; color: var(--sub); }
+  input, select, button { font: inherit; color: var(--text); background: #0f1115; border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; }
+  input[type=number] { width: 110px; }
+  button { background: var(--accent); border-color: var(--accent); color: #08121f; font-weight: 600; cursor: pointer; }
+  button.ghost { background: transparent; color: var(--text); border-color: var(--line); font-weight: 400; }
+  button:disabled { opacity: .5; cursor: default; }
+  .note { color: var(--sub); font-size: 13px; margin: 6px 0 0; }
+  .bar { height: 6px; background: #0f1115; border-radius: 3px; overflow: hidden; margin: 12px 0 4px; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--accent); }
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; margin-top: 12px; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--sub); font-weight: 500; }
+  a { color: var(--accent); }
+  .bad { color: var(--bad); } .warn { color: var(--warn); } .good { color: var(--good); }
+</style>
+</head>
+<body>
+<main>
+  <h1>봇 실행</h1>
+  <p class="sub">봇은 하나, 입구는 둘. 다시 보기는 시드 하나를 화면으로 보고, 대량 실행은 판 수만큼 화면 없이 돌려 요약만 남긴다.</p>
+
+  <section>
+    <h2>다시 보기</h2>
+    <label>실력 <select id="rLevel"></select></label>
+    <label>시드 <input id="rSeed" type="number" min="0" value="1"></label>
+    <button id="rGo">화면으로 보기</button>
+    <p class="note">같은 시드 + 같은 실력이면 대량 실행에서 나온 판이 그대로 다시 나온다. 판의 적 등장·카드 후보는 사람이 같은 시드로 할 때와도 같다.</p>
+  </section>
+
+  <section>
+    <h2>대량 실행</h2>
+    <label>실력 <select id="bLevel"><option value="all">전부 (숙련·중간·초보)</option></select></label>
+    <label>판 수 <input id="bCount" type="number" min="1" value="100"></label>
+    <label>첫 시드 <input id="bSeed" type="number" min="0" value="1"></label>
+    <button id="bGo">실행</button>
+    <button id="bStop" class="ghost" disabled>멈춤</button>
+    <p class="note">시드는 첫 시드부터 1씩 올라간다. "전부"면 실력마다 같은 시드 묶음을 돌려서 실력끼리 같은 판으로 비교된다. 화면은 항상 꺼져 있다.</p>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="status" class="note"></div>
+    <div class="scroll"><table id="sum" hidden></table></div>
+    <div id="dl" hidden style="margin-top:12px">
+      <button id="dlJson" class="ghost">판별 기록 JSON 받기</button>
+      <button id="dlCsv" class="ghost">판별 요약 CSV 받기</button>
+    </div>
+    <div id="odd" hidden style="margin-top:16px">
+      <h2>시간 초과 판</h2>
+      <p class="note">시스템 기획 6번: 시간 초과 판은 튀는 판으로 바로 짚는다. 앞에서부터 최대 30판.</p>
+      <div class="scroll"><table id="oddT"></table></div>
+    </div>
+  </section>
+</main>
+
+<script src="data/common.js"></script>
+<script src="data/player.js"></script>
+<script src="data/enemies.js"></script>
+<script src="data/cards.js"></script>
+<script src="data/bosses.js"></script>
+<script src="data/maps.js"></script>
+<script src="data/skills.js"></script>
+<script src="data/env.js"></script>
+<script src="data/bots.js"></script>
+<script src="core/rng.js"></script>
+<script src="core/geom.js"></script>
+<script src="core/player.js"></script>
+<script src="core/enemy.js"></script>
+<script src="core/boss.js"></script>
+<script src="core/wave.js"></script>
+<script src="core/cards.js"></script>
+<script src="core/game.js"></script>
+<script src="core/bot.js"></script>
+<script>
+(function () {
+  var B = G.DT.bots, $ = function (id) { return document.getElementById(id); };
+  B.levelOrder.forEach(function (k) {
+    ['rLevel', 'bLevel'].forEach(function (id) {
+      var o = document.createElement('option'); o.value = k; o.textContent = B.levels[k].label; $(id).appendChild(o);
+    });
+  });
+  function replayUrl(level, seed) { return 'index.html#bot=' + level + '&seed=' + seed; }
+  $('rGo').onclick = function () { location.href = replayUrl($('rLevel').value, Math.max(0, parseInt($('rSeed').value, 10) || 0)); };
+
+  var records = [], stop = false;
+  function fmt(v, d) { return v.toFixed(d === undefined ? 1 : d); }
+
+  function summarize() {
+    var by = {};
+    records.forEach(function (r) {
+      var a = by[r.level] = by[r.level] || { n: 0, clear: 0, death: 0, timeout: 0, floor: 0, time: 0, taken: 0, seen: 0, engage: 0, breaks: 0, walls: 0 };
+      a.n++; a[r.outcome]++; a.floor += r.floor; a.time += r.time; a.taken += r.taken;
+      a.seen += r.chargeSeen; a.engage += r.chargeEngage; a.breaks += r.breaks; a.walls += r.walls;
+    });
+    var h = '<tr><th>실력</th><th>판</th><th>클리어</th><th>사망</th><th>시간 초과</th><th>평균 도달 층</th><th>평균 전투 시간</th><th>평균 받은 피해</th><th>돌진 알아차림</th><th>깎으러 붙음</th><th>파훼</th><th>벽 충돌</th></tr>';
+    B.levelOrder.forEach(function (k) {
+      var a = by[k]; if (!a) return;
+      var pct = function (x) { return x + ' <span class="note">(' + fmt(100 * x / a.n, 0) + '%)</span>'; };
+      h += '<tr><td>' + B.levels[k].label + '</td><td>' + a.n + '</td><td class="good">' + pct(a.clear) + '</td><td class="bad">' + pct(a.death) + '</td><td class="warn">' + pct(a.timeout) +
+        '</td><td>' + fmt(a.floor / a.n, 2) + '</td><td>' + fmt(a.time / a.n) + '초</td><td>' + fmt(a.taken / a.n) + '</td><td>' + a.seen + '</td><td>' + a.engage + '</td><td>' + a.breaks + '</td><td>' + a.walls + '</td></tr>';
+    });
+    $('sum').innerHTML = h; $('sum').hidden = false;
+
+    var odd = records.filter(function (r) { return r.outcome === 'timeout'; }).slice(0, 30);
+    $('odd').hidden = odd.length === 0;
+    var oh = '<tr><th>실력</th><th>시드</th><th>멈춘 곳</th><th>그 웨이브 걸린 시간</th><th>피하기</th><th></th></tr>';
+    odd.forEach(function (r) {
+      var w = r.waves[r.waves.length - 1] || { time: 0 };
+      oh += '<tr><td>' + B.levels[r.level].label + '</td><td>' + r.seed + '</td><td>' + r.floor + '층 웨이브 ' + r.wave + '</td><td>' + fmt(w.time) + '초</td><td>' + r.dodges + '</td><td><a href="' + replayUrl(r.level, r.seed) + '">이 판 다시 보기</a></td></tr>';
+    });
+    $('oddT').innerHTML = oh;
+  }
+
+  $('bGo').onclick = function () {
+    var levels = $('bLevel').value === 'all' ? B.levelOrder.slice() : [$('bLevel').value];
+    var count = Math.max(1, parseInt($('bCount').value, 10) || 1), seed0 = Math.max(0, parseInt($('bSeed').value, 10) || 0);
+    var jobs = [];
+    levels.forEach(function (lv) { for (var i = 0; i < count; i++) jobs.push([lv, (seed0 + i) >>> 0]); });
+    records = []; stop = false;
+    $('bGo').disabled = true; $('bStop').disabled = false; $('dl').hidden = true;
+    var t0 = performance.now(), done = 0;
+    (function chunk() {
+      var until = performance.now() + 40;          // 40ms씩 돌리고 화면에 숨 돌릴 틈을 줌
+      while (done < jobs.length && performance.now() < until && !stop) {
+        records.push(G.Core.bot.runOne(G.DT, jobs[done][1], jobs[done][0])); done++;
+      }
+      $('bar').style.width = (100 * done / jobs.length) + '%';
+      $('status').textContent = done + ' / ' + jobs.length + '판 · ' + fmt((performance.now() - t0) / 1000) + '초' + (stop ? ' · 멈춤' : '');
+      if (done % 50 === 0 || done === jobs.length || stop) summarize();
+      if (done < jobs.length && !stop) setTimeout(chunk, 0);
+      else { summarize(); $('bGo').disabled = false; $('bStop').disabled = true; $('dl').hidden = records.length === 0; }
+    })();
+  };
+  $('bStop').onclick = function () { stop = true; };
+
+  function save(name, text, type) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], { type: type }));
+    a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  }
+  $('dlJson').onclick = function () { save('bot_runs.json', JSON.stringify(records), 'application/json'); };
+  $('dlCsv').onclick = function () {
+    var cols = ['seed', 'level', 'outcome', 'floor', 'wave', 'time', 'kills', 'dealt', 'taken', 'maxHit', 'dodges', 'dashDodges', 'walkDodges', 'chargeSeen', 'chargeEngage', 'breaks', 'walls', 'picks'];
+    var lines = [cols.join(',')].concat(records.map(function (r) { return cols.map(function (c) { return '"' + String(r[c]).replace(/"/g, '""') + '"'; }).join(','); }));
+    save('bot_runs.csv', '﻿' + lines.join('\n'), 'text/csv');
+  };
+})();
+</script>
+</body>
+</html>
