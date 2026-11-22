@@ -1,8 +1,8 @@
 // 보스 규칙(보스 1, 근접 중장형). 화면 코드 없음.
-// 상태(e.state): wait(대기) / follow(따라감) / slamTele(내려찍기 예고) / chargeTele(돌진 예고)
+// 상태(e.state): wait(대기) / follow(따라감) / slamTele(휘두르기 예고) / chargeTele(돌진 예고)
 //               / charging(돌진 중) / groggy(그로기)
 // 행동 순서(보스 기획서): 첫 행동은 두 패턴 중 무작위 → 패턴 뒤 대기 → 돌진 쿨타임이 끝났으면 돌진
-//   → 아니면 플레이어가 내려찍기 사용 거리 안이면 내려찍기, 밖이면 따라감 → 반복
+//   → 아니면 플레이어가 휘두르기 사용 거리 안이면 휘두르기, 밖이면 따라감 → 반복
 // 보스는 항상 슈퍼아머(넉백·예고 끊김 없음). 돌진 예고 중 슈퍼아머 게이지를 다 깎으면 파훼(그로기)
 var G = globalThis.G = globalThis.G || {};
 G.Core = G.Core || {};
@@ -66,7 +66,7 @@ G.Core.boss = {
   decide: function (s, e, def) {
     var B = G.Core.boss;
     if (e.firstPick === 'charge') { e.firstPick = null; B.startCharge(s, e, def); return; }
-    if (e.firstPick === 'slam') {            // 첫 행동이 내려찍기면 닿을 때까지 따라감(그동안 돌진 안 함)
+    if (e.firstPick === 'slam') {            // 첫 행동이 휘두르기면 닿을 때까지 따라감(그동안 돌진 안 함)
       e.state = 'follow'; return;
     }
     if (e.chargeCd <= 0) { B.startCharge(s, e, def); return; }

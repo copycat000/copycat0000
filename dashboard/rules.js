@@ -31,9 +31,9 @@ G.Dash.RULES = [
     get: function (M) { return M.novice.hitRate.charge * 100; },
     range: [null, 20], temp: true },
 
-  { id: 'R4b', name: '초보 봇 내려찍기', src: 'DT · 봇 실력',
+  { id: 'R4b', name: '초보 봇 휘두르기', src: 'DT · 봇 실력',
     sentence: '초보는 보스 돌진만 피하고 나머지는 거의 맞는다',
-    measure: '초보 봇이 내려찍기에 맞은 비율', unit: '%',
+    measure: '초보 봇이 휘두르기에 맞은 비율', unit: '%',
     get: function (M) { return M.novice.hitRate.slam * 100; },
     range: [70, null], temp: true },
 

@@ -138,7 +138,7 @@ G.Shapes = (function () {
       }
     },
 
-    // 보스 예고: 내려찍기는 큰 부채꼴이 차오름, 돌진은 몸 폭만 한 길이 차오름(점선 테두리)
+    // 보스 예고: 휘두르기는 큰 부채꼴이 차오름, 돌진은 몸 폭만 한 길이 차오름(점선 테두리)
     bossTelegraph: function (ctx, e, def, map) {
       var prog = 1 - Math.max(0, e.teleTime) / e.teleMax;
       if (e.state === 'slamTele') {

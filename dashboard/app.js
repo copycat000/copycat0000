@@ -3,7 +3,7 @@
   var S = G.Dash.sim, RULES = G.Dash.RULES, LV = S.LEVELS;
   var LV_NAME = { skilled: '숙련', mid: '중간', novice: '초보' };
   var LV_COLOR = { skilled: 'var(--sk)', mid: 'var(--md)', novice: 'var(--nv)' };
-  var KIND = [['melee', '근거리형', 'var(--h1)'], ['ranged', '원거리형', 'var(--h2)'], ['slam', '보스 내려찍기', 'var(--h3)'], ['charge', '보스 돌진', 'var(--h4)']];
+  var KIND = [['melee', '근거리형', 'var(--h1)'], ['ranged', '원거리형', 'var(--h2)'], ['slam', '보스 휘두르기', 'var(--h3)'], ['charge', '보스 돌진', 'var(--h4)']];
   var STORE = 'nn-dashboard-conds-v1';
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
@@ -189,7 +189,7 @@
       var bar = KIND.map(function (k) { var v = m.hitBy[k[0]]; return '<div style="width:' + (max ? v / max * 100 : 0) + '%;background:' + k[2] + '" title="' + k[1] + ' 판당 ' + fx(v) + '"></div>'; }).join('');
       var gh = p ? '<div class="ghostline">' + KIND.map(function (k) { return '<div style="width:' + (max ? p.hitBy[k[0]] / max * 100 : 0) + '%;background:' + k[2] + '"></div>'; }).join('') + '</div>' : '';
       var rate = function (k, lab) { return '<span>' + lab + ' <b>' + pct(m.hitRate[k], 1) + '</b>' + (p ? ' <s>(' + pct(p.hitRate[k], 1) + ')</s>' : '') + '</span>'; };
-      h += '<div class="brow"><b>' + LV_NAME[lv] + '</b><div><div class="hbar">' + bar + '</div>' + gh + '</div><div class="nums">' + rate('melee', '근거리') + rate('slam', '내려찍기') + rate('charge', '돌진') + '</div></div>';
+      h += '<div class="brow"><b>' + LV_NAME[lv] + '</b><div><div class="hbar">' + bar + '</div>' + gh + '</div><div class="nums">' + rate('melee', '근거리') + rate('slam', '휘두르기') + rate('charge', '돌진') + '</div></div>';
     });
     $('hitBars').innerHTML = h + '<p class="note">막대 길이는 판당 받은 피해(가장 긴 막대 ' + fx(max) + '). 맞은 비율 = 맞은 횟수 ÷ 그 공격이 나온 횟수. 원거리형은 탄이 여러 갈래로 남아 비율을 따로 내지 않았다.</p>';
     var t = '<thead><tr><th>실력</th><th class="r">돌진 알아차림</th><th class="r">붙기로 함</th><th class="r">붙어서 깸</th><th class="r">알아차리기 전에 깨짐</th><th class="r">벽 충돌</th><th>층별 붙은 비율 (1→5층)</th></tr></thead><tbody>';
