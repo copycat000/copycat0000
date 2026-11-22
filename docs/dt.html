@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DT</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<style>:root{--bg:#f6f7f9;--card:#fff;--line:#e3e6eb;--text:#1d2129;--sub:#5d6573;--accent:#2f5d8a;--th:#f0f2f5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1115;--card:#171a20;--line:#2a2f38;--text:#e8eaf0;--sub:#9aa2b1;--accent:#6fa8dc;--th:#1e222a}}
+:root[data-theme="dark"]{--bg:#0f1115;--card:#171a20;--line:#2a2f38;--text:#e8eaf0;--sub:#9aa2b1;--accent:#6fa8dc;--th:#1e222a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.75 "IBM Plex Sans KR",system-ui,"Malgun Gothic",sans-serif}
+a{color:var(--accent)}nav{border-bottom:1px solid var(--line);background:var(--card)}
+nav .in{max-width:880px;margin:0 auto;padding:10px 16px;display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14px}
+nav a{text-decoration:none;color:var(--sub)}nav a.on{color:var(--text);font-weight:700}nav .home{color:var(--accent);margin-right:6px}
+main{max-width:880px;margin:0 auto;padding:32px 16px 64px}
+h1{font-size:26px;line-height:1.35;margin:0 0 4px}h2{font-size:20px;margin:40px 0 10px;padding-top:8px;border-top:1px solid var(--line)}h3{font-size:17px;margin:28px 0 8px}
+h1+p{color:var(--sub);font-size:13px;margin-top:0}
+.tw{overflow-x:auto;margin:14px 0}table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.55;background:var(--card)}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}th{background:var(--th);white-space:nowrap}
+code{font-size:13px;background:var(--th);padding:1px 4px;border-radius:4px}
+.pn{display:flex;justify-content:space-between;gap:12px;margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:14px}
+.list a{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin-bottom:10px}
+.list a:hover{border-color:var(--accent)}.list b{font-size:16px}.list span{display:block;color:var(--sub);font-size:14px}</style>
+</head>
+<body>
+<nav><div class="in"><a class="home" href="../">← 처음으로</a><a href="./">기획서 목록</a><a href="overview.html">통합 기획서 – 큰 틀</a><a href="system.html">시스템 기획</a><a href="level.html">레벨 디자인</a><a href="boss.html">보스 기획서</a><a href="dt.html" class="on">DT</a><a href="dashboard.html">대시보드 기획서</a></div></nav>
+<main>
+<h1>DT – 첫 테스트 판 임시값</h1>
+<p>Nov 20, 2026 · @타디온</p>
+<p>도형으로 된 첫 테스트 판을 돌리기 위한 시작값이다. 근거 데이터가 있는 값이 아니라 판이 돌아가게 정한 값이고, 돌려보면서 고친다. 계산식은 시스템 기획 문서 0번을 따른다.</p>
+<h2>단위 기준</h2>
+<ul>
+<li>거리는 px, 속도는 px/초, 시간은 초.</li>
+<li>전투 화면은 1280×720, 플레이어 도형 지름은 32px로 잡고 거리를 정했다. 화면 크기가 다르게 정해지면 거리와 속도를 같은 비율로 바꾸면 된다.</li>
+<li>퍼센트 스탯은 %p로 더한다(5% + 5% = 10%).</li>
+</ul>
+<h2>플레이어</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>항목</th>
+<th>시작값</th>
+<th>이렇게 잡은 이유</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>최대 체력</td>
+<td>100</td>
+<td>피해가 공격 횟수로 바로 읽힌다. 근거리형에게 10대 맞으면 죽는다</td>
+</tr>
+<tr>
+<td>이동 속도</td>
+<td>200 px/초</td>
+<td>화면 가로를 6.4초에 가로지른다. 두 적보다 빨라서 무빙으로 거리를 벌 수 있다</td>
+</tr>
+<tr>
+<td>공격력</td>
+<td>10</td>
+<td>카드로 오른 값을 비율로 보기 쉽게 딱 떨어지는 수</td>
+</tr>
+<tr>
+<td>방어력</td>
+<td>0</td>
+<td>빼기 계산이라 작은 값도 크게 느껴진다. 카드로만 올린다</td>
+</tr>
+<tr>
+<td>치명타 확률</td>
+<td>10%</td>
+<td>처음엔 5%(가끔 터지는 정도)로 두었다가 타디온이 10%로 정함(11/22)</td>
+</tr>
+<tr>
+<td>치명타 피해 배율</td>
+<td>1.5배</td>
+<td>터졌을 때 눈에 띄는 최소한의 차이</td>
+</tr>
+<tr>
+<td>자연 회복량</td>
+<td>0 /초</td>
+<td>웨이브 사이에 체력을 안 채워주는 규칙이라, 회복을 카드 선택으로 남겨두려고 0에서 시작한다</td>
+</tr>
+<tr>
+<td>피해 흡수율</td>
+<td>0%</td>
+<td>자연 회복과 같은 이유</td>
+</tr>
+<tr>
+<td>피격 무적 시간</td>
+<td>0.5초</td>
+<td>두 적의 공격이 거의 동시에 들어와도 한 번만 맞는 길이</td>
+</tr>
+<tr>
+<td>플레이어 넉백 거리</td>
+<td>16px</td>
+<td>적이 기본 공격에 맞아 밀리는 거리와 같게 뒀다. 두 값이 같으면 밀리는 느낌을 하나로 맞출 수 있다. 보스 돌진 밀어내기는 이 값의 2배(32px)</td>
+</tr>
+<tr>
+<td>플레이어 넉백 시간</td>
+<td>0.1초</td>
+<td>적 넉백 시간과 같은 이유. 피격 무적(0.5초) 안에 끝난다</td>
+</tr>
+</tbody></table></div>
+<h2>기본 공격, 대시, 공통</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>분류</th>
+<th>항목</th>
+<th>시작값</th>
+<th>이렇게 잡은 이유</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>기본 공격</td>
+<td>피해 배율</td>
+<td>1.0배</td>
+<td>공격력이 곧 한 방 피해가 되게 해서 읽기 쉽게</td>
+</tr>
+<tr>
+<td>기본 공격</td>
+<td>거리</td>
+<td>60px</td>
+<td>몸 지름 32px의 두 배 조금 넘게. 근거리형 공격 범위(50px)보다 길어서, 거리를 잘 잡으면 안 맞고 때릴 수 있다</td>
+</tr>
+<tr>
+<td>기본 공격</td>
+<td>각도</td>
+<td>90°</td>
+<td>방향을 직접 맞춰야 하는 규칙이라, 8방향 사이(45°)를 넓게 덮는 각도</td>
+</tr>
+<tr>
+<td>기본 공격</td>
+<td>쿨타임</td>
+<td>0.4초</td>
+<td>연타 감은 남기고 아무 때나 누르는 건 막는 길이</td>
+</tr>
+<tr>
+<td>기본 공격</td>
+<td>평타 최소 쿨타임</td>
+<td>0.2초</td>
+<td>시작값의 절반. 쿨감이 50%까지만 효과가 있다</td>
+</tr>
+<tr>
+<td>기본 공격</td>
+<td>평타 최대 각도</td>
+<td>180°</td>
+<td>각도 카드가 쌓여도 여기서 멈춘다. 닿으면 각도 카드는 후보에서 빠진다(카드 표의 기본 공격 각도 참고)</td>
+</tr>
+<tr>
+<td>기본 공격</td>
+<td>넉백 거리</td>
+<td>16px</td>
+<td>프로토타입에서 손맛 보려고 넣은 임시값. 근거 있는 값은 아니고, 타디온이 체감 괜찮다고 해서 유지. 밸런스 조절 때 다시 본다</td>
+</tr>
+<tr>
+<td>기본 공격</td>
+<td>넉백 시간</td>
+<td>0.1초</td>
+<td>넉백 거리와 같이 넣은 값</td>
+</tr>
+<tr>
+<td>대시</td>
+<td>거리</td>
+<td>120px</td>
+<td>근거리형 공격 범위(50px)를 두 번 넘게 빠져나간다</td>
+</tr>
+<tr>
+<td>대시</td>
+<td>쿨타임</td>
+<td>1초</td>
+<td>처음엔 2초였다. 11/20에 테스트로 1초로 해봤는데 플레이 체감상 문제가 없어서 1초로 정함(타디온 11/22). 통합 기획서의 &quot;5초 안쪽&quot; 안이고, 근거리형 공격 쿨타임(2초)보다 짧아서 한 마리 공격은 매번 피할 수 있다</td>
+</tr>
+<tr>
+<td>대시</td>
+<td>무적 시간</td>
+<td>0.2초</td>
+<td>짧은 무적. 타이밍을 맞춰야 피할 수 있는 길이</td>
+</tr>
+<tr>
+<td>공통</td>
+<td>최소 피해</td>
+<td>1</td>
+<td>방어력이 아무리 높아도 맞으면 달게</td>
+</tr>
+<tr>
+<td>공통</td>
+<td>묶음 등장 간격</td>
+<td>10초</td>
+<td>첫 묶음을 다 잡기에는 조금 빠듯한 길이. 아래 계산 참고</td>
+</tr>
+<tr>
+<td>공통</td>
+<td>층당 제한 시간</td>
+<td>2분</td>
+<td>타디온 가정값(11/20). 봇 판 종료 조건. 참고로 웨이브 1~4에서 앞 묶음을 못 잡아 간격(10초)대로 다 나오면, 마지막 묶음까지 웨이브당 20초 걸려 4개면 80초다. 여기에 마지막 묶음 처리와 보스(카드 없이 약 23초)를 더하면 2분 근처라, 약한 봇은 시간 초과가 꽤 나올 수 있다</td>
+</tr>
+</tbody></table></div>
+<h2>테스트 맵</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>항목</th>
+<th>시작값</th>
+<th>이렇게 잡은 이유</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>테스트 맵 크기(가로·세로)</td>
+<td>1280 × 720px</td>
+<td>화면 한 장에 방이 다 들어와서 카메라를 안 만들어도 된다</td>
+</tr>
+<tr>
+<td>적 등장 최소 거리</td>
+<td>300px</td>
+<td>가운데서 세로 가장자리까지가 360px라 그 안쪽. 원거리형 경계 범위(150px)의 두 배라 나오자마자 붙지 않는다</td>
+</tr>
+</tbody></table></div>
+<h2>적</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>항목</th>
+<th>근거리형</th>
+<th>원거리형</th>
+<th>이렇게 잡은 이유</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>체력</td>
+<td>30</td>
+<td>20</td>
+<td>기본 공격 3대 / 2대. 멀리서 쏘는 적을 잡으러 다가간 보상으로 빨리 죽게</td>
+</tr>
+<tr>
+<td>이동 속도</td>
+<td>160 px/초</td>
+<td>120 px/초</td>
+<td>둘 다 플레이어(200)보다 느려서 거리를 벌 수 있다. 근거리형은 쓸모없이 느리진 않게</td>
+</tr>
+<tr>
+<td>몸 지름</td>
+<td>32px</td>
+<td>32px</td>
+<td>프로토타입에서 임시로 넣은 값. 플레이어 몸과 같게</td>
+</tr>
+<tr>
+<td>공격 범위</td>
+<td>50px</td>
+<td>350px</td>
+<td>근거리형은 부채꼴 거리로, 플레이어 기본 공격(60px)보다 짧게. 원거리형은 화면 세로(720px)의 절반(360px)보다 조금 짧게</td>
+</tr>
+<tr>
+<td>공격 각도</td>
+<td>90°</td>
+<td>-</td>
+<td>플레이어 기본 공격과 같은 부채꼴 규칙이라 각도도 같게 두고, 거리(50 vs 60px)만 다르게</td>
+</tr>
+<tr>
+<td>경계 범위</td>
+<td>-</td>
+<td>150px</td>
+<td>대시 한 번(120px)으로는 완전히 못 따라붙는 거리</td>
+</tr>
+<tr>
+<td>공격 피해</td>
+<td>10</td>
+<td>8</td>
+<td>체력 100 기준 10대 / 13대. 원거리형은 피하기 어려운 대신 조금 약하게</td>
+</tr>
+<tr>
+<td>공격 쿨타임</td>
+<td>2초</td>
+<td>2.5초</td>
+<td>여러 마리가 겹쳐야 위험하고 한 마리는 충분히 대응되는 간격</td>
+</tr>
+<tr>
+<td>예고 시간</td>
+<td>0.6초</td>
+<td>0.8초</td>
+<td>두 적 모두 사람이 보고 피할 수 있는 길이. 원거리형은 멀어서 예고가 눈에 덜 띄는 만큼 더 길게</td>
+</tr>
+<tr>
+<td>투사체 속도</td>
+<td>-</td>
+<td>300 px/초</td>
+<td>플레이어(200)보다 빨라서 걷기만으로는 못 따돌리고, 옆으로 비켜서거나 대시해야 한다</td>
+</tr>
+<tr>
+<td>투사체 크기</td>
+<td>-</td>
+<td>지름 12px</td>
+<td>플레이어 몸(32px)보다 작게. 정면으로 오는 투사체를 피하려면 옆으로 22px 이상 비켜야 하고, 걷기로 약 0.11초 걸린다</td>
+</tr>
+</tbody></table></div>
+<h2>보스 1: 근접 중장형 (프로토 임시값)</h2>
+<p>프로토타입에 보스를 넣으면서 쓴 값이다. 1층 보스 처치 목표 시간은 정해진 게 없어서(타디온 11/20), 기준은 지금 플레이어 수치뿐이다. 거리는 보스 몸 테두리부터 잰다.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>분류</th>
+<th>항목</th>
+<th>값</th>
+<th>이렇게 잡은 이유</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>기본</td>
+<td>체력</td>
+<td>600</td>
+<td>카드 없이 계속 맞히면 약 23초(치명타 10% 기준 한 대 기대 피해 10.5를 0.4초마다)</td>
+</tr>
+<tr>
+<td>기본</td>
+<td>몸 지름</td>
+<td>64px</td>
+<td>일반 적(32px)의 2배. 한눈에 보스로 보이게</td>
+</tr>
+<tr>
+<td>기본</td>
+<td>이동 속도</td>
+<td>120 px/초</td>
+<td>원거리형과 같은 속도. 플레이어(200)보다 느리다</td>
+</tr>
+<tr>
+<td>기본</td>
+<td>패턴 뒤 대기 시간</td>
+<td>0.8초</td>
+<td>패턴이 끝난 뒤 때릴 틈</td>
+</tr>
+<tr>
+<td>기본</td>
+<td>등장 후 첫 행동까지</td>
+<td>1초</td>
+<td>나오자마자 맞는 상황 방지</td>
+</tr>
+<tr>
+<td>내려찍기</td>
+<td>부채꼴 거리</td>
+<td>120px</td>
+<td></td>
+</tr>
+<tr>
+<td>내려찍기</td>
+<td>부채꼴 각도</td>
+<td>120°</td>
+<td></td>
+</tr>
+<tr>
+<td>내려찍기</td>
+<td>사용 거리</td>
+<td>90px(몸 테두리끼리)</td>
+<td>부채꼴 거리보다 짧게. 범위 끝에서 깔짝거리기 방지</td>
+</tr>
+<tr>
+<td>내려찍기</td>
+<td>예고 시간</td>
+<td>0.9초</td>
+<td>일반 적(0.6~0.8초)보다 길게</td>
+</tr>
+<tr>
+<td>내려찍기</td>
+<td>피해</td>
+<td>20</td>
+<td>근거리형의 2배</td>
+</tr>
+<tr>
+<td>내려찍기</td>
+<td>플레이어 넉백</td>
+<td>플레이어 넉백 거리의 1배(16px)</td>
+<td></td>
+</tr>
+<tr>
+<td>돌진</td>
+<td>예고 시간</td>
+<td>2.5초</td>
+<td>이 시간 안에 슈퍼아머를 깎아야 한다. 처음 1.2초에서 올림(11/22). 의도: 반응하고 다가가는 시간까지 넣으면 1.2초는 너무 짧다</td>
+</tr>
+<tr>
+<td>돌진</td>
+<td>속도</td>
+<td>600 px/초</td>
+<td></td>
+</tr>
+<tr>
+<td>돌진</td>
+<td>거리</td>
+<td>500px</td>
+<td></td>
+</tr>
+<tr>
+<td>돌진</td>
+<td>피해</td>
+<td>20</td>
+<td>내려찍기와 같게</td>
+</tr>
+<tr>
+<td>돌진</td>
+<td>쿨타임</td>
+<td>8초(돌진이 끝난 뒤부터)</td>
+<td></td>
+</tr>
+<tr>
+<td>돌진</td>
+<td>플레이어 넉백</td>
+<td>플레이어 넉백 거리의 2배(32px)</td>
+<td>보스 기획서에서 정한 배수</td>
+</tr>
+<tr>
+<td>돌진</td>
+<td>슈퍼아머 수치</td>
+<td>30</td>
+<td>카드 없이 한 대 10이라 평타 3번이 맞아야 깎인다(치명타가 터지면 덜 필요). 예고 2.5초 동안 평타는 최대 7번이지만, 알아차리고 다가가는 시간만큼 줄어든다. 11/20에 테스트로 15를 썼다가 30으로 되돌림(타디온 11/22)</td>
+</tr>
+<tr>
+<td>그로기</td>
+<td>파훼 성공</td>
+<td>3초</td>
+<td>파훼 쪽이 더 길게(보스 기획서)</td>
+</tr>
+<tr>
+<td>그로기</td>
+<td>벽 충돌</td>
+<td>1.5초</td>
+<td>파훼 성공의 절반</td>
+</tr>
+<tr>
+<td>파훼</td>
+<td>파훼 히트스톱 시간</td>
+<td>0.3초</td>
+<td>프로토타입에서 0.15초로 넣었다가 타디온이 0.3초로 올려 보고 확정(11/20)</td>
+</tr>
+</tbody></table></div>
+<p>카드 없이 한 대 10이라 슈퍼아머 30은 평타 3번이 맞아야 깎인다(10 × 3 = 30). 돌진 예고 2.5초에서 알아차리고 다가가는 시간을 뺀 동안 3번을 쳐야 한다. 카드를 몇 장 먹은 1층 끝에서는 여유가 생긴다. 목표 처치 시간이 정해지면 체력부터 다시 맞춘다.</p>
+<h2>봇 실력 3단계</h2>
+<p>타디온 확정(11/20). 봇은 예고가 보인 뒤 이 구간 안에서 매번 무작위로 뽑은 시간만큼 있다가 대시한다.</p>
+<p>의도: 구간을 예고 경계에 딱 맞춰서, 어느 단계가 어떤 예고를 못 피하는지 데이터에서 바로 설명되게 한다. 중간은 근거리형 예고를 못 피하고 보스 패턴은 피한다. 초보는 보스 돌진만 피하고 나머지는 거의 맞는다.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>단계</th>
+<th>반응 시간 구간</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>숙련</td>
+<td>0.2~0.4초</td>
+</tr>
+<tr>
+<td>중간</td>
+<td>0.4~0.7초</td>
+</tr>
+<tr>
+<td>초보</td>
+<td>0.7~1.0초</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>구간 경계는 &quot;피할 수 있는 마지막 반응 시간 = 적 예고 시간 − 대시 이동 시간(0.2초)&quot;에서 나왔다. 근거리형 0.6 → 0.4초, 보스 내려찍기 0.9 → 0.7초, 보스 돌진 2.5 → 2.3초.</li>
+<li>이 계산대로면 대시만으로 피할 때 중간 봇은 근거리형 공격을, 초보 봇은 보스 내려찍기까지 거의 다 맞는다(구간 하한이 경계와 같아서). 거리를 벌려 피하는 경우는 빠진 계산이라 시뮬로 확인한다.</li>
+<li>숙련 하한 0.2초는 사람 단순 반응 속도를 기준으로 잡았고, 직접 플레이 기록으로 맞춘다.</li>
+<li>적 예고 시간이 바뀌어도 이 구간은 따라 바꾸지 않는다.</li>
+</ul>
+<h2>카드</h2>
+<p>단계별 증가폭은 전부 1단계의 1배·2배·3배로 두었다. 단계 차이가 한눈에 읽히고, 대시보드에서 1단계 값 하나만 바꿔도 나머지가 따라오게 하려고.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>카드</th>
+<th>1단계</th>
+<th>2단계</th>
+<th>3단계</th>
+<th>이렇게 잡은 이유</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>최대 체력</td>
+<td>+10</td>
+<td>+20</td>
+<td>+30</td>
+<td>1단계 = 근거리형 공격 한 대를 더 버틴다</td>
+</tr>
+<tr>
+<td>이동 속도</td>
+<td>+10 px/초</td>
+<td>+20 px/초</td>
+<td>+30 px/초</td>
+<td>1단계 = 시작값의 5%. 너무 빨라지면 적을 그냥 따돌릴 수 있어서 작게</td>
+</tr>
+<tr>
+<td>공격력</td>
+<td>+2</td>
+<td>+4</td>
+<td>+6</td>
+<td>1단계 = 시작값의 20%. 3단계 한 장이면 근거리형을 2대에 잡는다(16 × 2 = 32)</td>
+</tr>
+<tr>
+<td>방어력</td>
+<td>+1</td>
+<td>+2</td>
+<td>+3</td>
+<td>1단계 = 근거리형 피해의 10% 감소. 빼기 계산이라 작게</td>
+</tr>
+<tr>
+<td>치명타 확률</td>
+<td>+5%p</td>
+<td>+10%p</td>
+<td>+15%p</td>
+<td>1단계 +5%p(시작값 10%의 절반)</td>
+</tr>
+<tr>
+<td>치명타 피해 배율</td>
+<td>+0.1배</td>
+<td>+0.2배</td>
+<td>+0.3배</td>
+<td>기본 1.5배에서 항목별로 크게 튀지 않게</td>
+</tr>
+<tr>
+<td>평타 쿨타임 감소</td>
+<td>+5%p</td>
+<td>+10%p</td>
+<td>+15%p</td>
+<td>최소 쿨타임까지 50%p 남아서, 한두 장으로는 바닥에 안 닿게</td>
+</tr>
+<tr>
+<td>자연 회복</td>
+<td>+0.5 /초</td>
+<td>+1 /초</td>
+<td>+1.5 /초</td>
+<td>1단계면 20초에 근거리형 공격 한 대를 채운다</td>
+</tr>
+<tr>
+<td>피해 흡수</td>
+<td>+2%p</td>
+<td>+4%p</td>
+<td>+6%p</td>
+<td>1단계면 근거리형 한 마리(30)를 잡을 때 0.6 회복. 적을 많이 잡을수록 값이 커지는 카드라 작게 시작</td>
+</tr>
+<tr>
+<td>기본 공격 피해 배율</td>
+<td>+0.1배</td>
+<td>+0.2배</td>
+<td>+0.3배</td>
+<td>1단계 = 10%. 공격력 카드(20%)보다 약한 대신 기본 공격 전용이라 스킬이 들어오면 차이가 생긴다</td>
+</tr>
+<tr>
+<td>기본 공격 거리</td>
+<td>+10px</td>
+<td>+20px</td>
+<td>+30px</td>
+<td>1단계 = 시작값의 약 17%</td>
+</tr>
+<tr>
+<td>기본 공격 각도</td>
+<td>+15°</td>
+<td>+30°</td>
+<td>+45°</td>
+<td>3단계 두 장이면 180°. 방향 맞추기가 거의 필요 없어지는 지점이라 여기까지만</td>
+</tr>
+</tbody></table></div>
+<p>스킬 쿨타임 감소 카드는 첫 테스트 판에 안 나오므로 비워둔다.</p>
+<p>카드별 중복 여부: 지금 카드 13종은 전부 중복 가능이다.</p>
+<p><strong>단계별 등장 확률:</strong> 1단계 60%, 2단계 30%, 3단계 10%. 높은 단계가 가끔 나와야 고를 때 고민이 생기는데, 이 비율은 그런 체감을 보려고 넣은 값이다. 카드 종류를 먼저 뽑고 그 카드의 단계를 뽑는다고 보고 정했다.</p>
+<h2>이 값으로 계산해 본 것</h2>
+<p>아래는 위 값과 레벨 문서의 웨이브별 마릿수를 넣고 계산한 것이다. 판을 돌린 결과가 아니라, 돌려본 뒤 비교할 기준이다.</p>
+<p><strong>11/20 추가:</strong> 아래 계산은 넉백이 없다는 전제다. 넉백이 들어가면서 기본 공격 거리(60px)가 근거리형 공격 거리(50px)보다 길어, 잘 치면 안 맞고 잡을 수 있게 됐다. 근거리형 한 마리 대응이나 묶음 처리 시간은 첫 테스트 판 결과로 다시 본다.</p>
+<p>11/22부터 프로토타입 값과 이 문서 값이 같다. 테스트로 프로토타입에서만 바꿔 쓰던 값(대시 쿨타임 1초, 치명타 확률 50%, 보스 슈퍼아머 15)은 타디온이 정리했다: 대시 쿨타임 1초는 이 문서에 반영, 치명타 확률 10%, 슈퍼아머 30.</p>
+<ul>
+<li>기본 공격만 쓸 때 초당 피해는 10 ÷ 0.4 = 25. 근거리형은 3대(첫 타부터 0.8초), 원거리형은 2대(0.4초)에 죽는다.</li>
+<li>한 층 적 체력 합은 1,690이다(웨이브 1부터 210 / 220 / 290 / 370, 웨이브 5 보스 600). 카드 없이 최소 169대를 맞혀야 한다.</li>
+<li>묶음 하나에서 가장 무거운 건 웨이브 4의 2·3묶음(130). 카드 없이 휘두르는 시간만 약 5초(13대 × 0.4초)라, 이동까지 합치면 10초 안에 못 잡고 다음 묶음이 겹치기 시작한다. 뒷 웨이브에서 적이 쌓이는 체감이 여기서 나오는지 보는 게 첫 확인 항목이다.</li>
+<li>플레이어는 근거리형 공격 10대에 죽는다. 방어력 3이면 한 대가 7이 되어 15대까지 버틴다.</li>
+<li>원거리형 투사체는 공격 범위 끝(350px)까지 약 1.17초 걸린다. 예고 0.8초까지 더하면 멀리서 쏜 공격은 피할 시간이 2초 넘게 있다.</li>
+<li>평타 쿨감은 50%p에서 바닥에 닿는다. 웨이브마다 카드를 고르면 한 판에 최대 25장이라, 3단계 4장이나 1단계 10장이면 닿을 수 있다.</li>
+</ul>
+<h2>시스템 쪽에 확인한 것</h2>
+<p>값을 넣다가 항목이 없어서 멈췄던 곳이다. 11/20에 타디온이 정했고 시스템 문서에 반영됐다.</p>
+<ul>
+<li>대시는 미끄러지듯 이동하고, 이동 시간은 대시 무적 시간과 같다(0.2초 동안 120px). 테스트로 다시 본다.</li>
+<li>근거리형 공격은 플레이어 기본 공격과 같은 부채꼴. 원거리형에 투사체 크기 항목이 생겼다. 둘 다 적 표에 값을 넣었다.</li>
+<li>최대 체력 카드를 고르면 현재 체력도 같은 만큼 오른다.</li>
+<li>카드는 종류를 겹치지 않게 3개 먼저 뽑고, 각각 단계를 단계별 등장 확률로 뽑는다.</li>
+</ul>
+<div class="pn"><span><a href="boss.html">← 보스 기획서</a></span><span><a href="dashboard.html">대시보드 기획서 →</a></span></div>
+</main>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>통합 기획서 – 큰 틀</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<style>:root{--bg:#f6f7f9;--card:#fff;--line:#e3e6eb;--text:#1d2129;--sub:#5d6573;--accent:#2f5d8a;--th:#f0f2f5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1115;--card:#171a20;--line:#2a2f38;--text:#e8eaf0;--sub:#9aa2b1;--accent:#6fa8dc;--th:#1e222a}}
+:root[data-theme="dark"]{--bg:#0f1115;--card:#171a20;--line:#2a2f38;--text:#e8eaf0;--sub:#9aa2b1;--accent:#6fa8dc;--th:#1e222a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.75 "IBM Plex Sans KR",system-ui,"Malgun Gothic",sans-serif}
+a{color:var(--accent)}nav{border-bottom:1px solid var(--line);background:var(--card)}
+nav .in{max-width:880px;margin:0 auto;padding:10px 16px;display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14px}
+nav a{text-decoration:none;color:var(--sub)}nav a.on{color:var(--text);font-weight:700}nav .home{color:var(--accent);margin-right:6px}
+main{max-width:880px;margin:0 auto;padding:32px 16px 64px}
+h1{font-size:26px;line-height:1.35;margin:0 0 4px}h2{font-size:20px;margin:40px 0 10px;padding-top:8px;border-top:1px solid var(--line)}h3{font-size:17px;margin:28px 0 8px}
+h1+p{color:var(--sub);font-size:13px;margin-top:0}
+.tw{overflow-x:auto;margin:14px 0}table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.55;background:var(--card)}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}th{background:var(--th);white-space:nowrap}
+code{font-size:13px;background:var(--th);padding:1px 4px;border-radius:4px}
+.pn{display:flex;justify-content:space-between;gap:12px;margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:14px}
+.list a{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin-bottom:10px}
+.list a:hover{border-color:var(--accent)}.list b{font-size:16px}.list span{display:block;color:var(--sub);font-size:14px}</style>
+</head>
+<body>
+<nav><div class="in"><a class="home" href="../">← 처음으로</a><a href="./">기획서 목록</a><a href="overview.html" class="on">통합 기획서 – 큰 틀</a><a href="system.html">시스템 기획</a><a href="level.html">레벨 디자인</a><a href="boss.html">보스 기획서</a><a href="dt.html">DT</a><a href="dashboard.html">대시보드 기획서</a></div></nav>
+<main>
+<h1>액션 로그라이트 통합 기획서 – 큰 틀</h1>
+<p>Nov 20, 2026 · @타디온</p>
+<p>이 문서는 콘셉트·테마, 시스템, 콘텐츠(레벨·보스), DT, 로그, 대시보드 여섯 파트가 작업하면서 벗어나면 안 되는 범위를 정한다. 세부 내용은 각 파트에서 정하고, 다 정해지면 이 틀 안에 합쳐서 통합 기획서 하나로 만든다.</p>
+<p>작업하다가 이 틀과 부딪히는 얘기가 나오면 그 파트에서 정하지 않고 이 문서를 먼저 고친 다음 반영한다.</p>
+<h2>1. 게임 정의</h2>
+<p><strong>한 줄 소개:</strong> 키보드로 이동·대시·공격만 써서, 무작위로 섞여 나오는 던전 5개 층을 뚫는 액션 로그라이트. 게임 이름은 아직 없음.</p>
+<p><strong>핵심 재미</strong></p>
+<ol>
+<li>예측 안 되는 상황과 환경에 유연하게 대처하기</li>
+<li>선택이 쌓여 빌드가 완성되는 성장 체감</li>
+<li>키보드 조작을 통한 액션감</li>
+</ol>
+<p><strong>아이디어 출발점:</strong> 이 게임은 포폴의 한 흐름으로 설계한다. 기획서에서 쌓아서 대시보드에서 터뜨리는 구성이고, 클라이맥스는 대시보드다. 그래서 게임의 모든 설계는 대시보드까지 이어지면서 기획자의 역량이 드러나도록 맞춘다. 각 파트에서 뭔가 넣을지 고민될 때 &quot;이게 대시보드에서 확인되는가&quot;를 먼저 본다.</p>
+<p><strong>포폴에서 하는 역할:</strong> 기획서에 공식으로 낸 의도 값을 적고, 대시보드의 시뮬 결과와 비교한다. 어긋난 지점에서 문제 발견 → 수치 조정 → 다시 돌려서 확인까지 한 바퀴가 보이는 게 목표다.</p>
+<h2>2. 바꾸면 안 되는 것</h2>
+<p>아이디어 스레드에서 정한 내용이다(기본정보.md &quot;정해진 것&quot;). 각 파트는 이 위에서 세부만 정한다.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>영역</th>
+<th>정해진 것</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>장르</td>
+<td>액션 로그라이트. 조작은 이동, 대시, 공격 정도</td>
+</tr>
+<tr>
+<td>승패</td>
+<td>체력은 수치형. 코어 루프 한 바퀴 = 1맵 = 1층 = 웨이브 5개(5번째는 보스). 5층 클리어 = 게임 클리어. 이후 무한 모드로 계속 반복 (의도: 클리어 뒤에도 계속 반복해서 돌 수 있게)</td>
+</tr>
+<tr>
+<td>맵</td>
+<td>미리 만든 맵 10개 중 5개가 무작위 순서로 나옴. 맵마다 웨이브 5개, 5번째 웨이브는 보스 (의도: 보스 전 일반 웨이브가 5번을 넘으면 루즈해지고, 2번이면 긴장감과 템포를 가져가기에 짧다. 3과 4 사이에서 일단 4로 두고 하면서 조정. 플레이 경험에서 나온 체감 기준)</td>
+</tr>
+<tr>
+<td>무작위 요소</td>
+<td>맵, 적 조합, 환경 조건, 업그레이드 후보, 봇의 반응 시간 흔들림과 업그레이드 선택. 전부 시드값에 묶어서 같은 판 재현</td>
+</tr>
+<tr>
+<td>조작</td>
+<td>키보드만. 8방향 이동(대각선 속도 정규화), 기본 공격은 근접 부채꼴, 누를 때마다 한 번씩 나가고 짧은 쿨타임 있음(쿨타임 감소가 쌓여도 끝없이 연타되지 않게), 스킬 슬롯 2칸, 대시는 짧은 무적 있음</td>
+</tr>
+<tr>
+<td>적</td>
+<td>몸 접촉 피해 없음, 공격에만 판정. 공격마다 예고 동작. 돌진형, 원거리형, 근거리형, 방해형(장판형, 디버프형, 적 회복형)</td>
+</tr>
+<tr>
+<td>성장</td>
+<td>웨이브 클리어마다 카드 3장 중 1장. 경험치형 없음. 갈래는 스킬(공격형·유틸형), 기본 공격 강화, 공격 스킬 강화, 능력치</td>
+</tr>
+<tr>
+<td>스킬 슬롯</td>
+<td>2칸 자유 구성. 얻을 때 키 선택, 찬 칸 고르면 교체, 웨이브 사이에 위치 바꾸기. 공격 스킬 강화는 모든 공격 스킬에 공통, 공격 스킬이 있을 때만 등장</td>
+</tr>
+<tr>
+<td>봇</td>
+<td>실력 3단계. 예고 동작을 보고 대시를 누르기까지의 반응 시간과 그 흔들림으로 구분. 업그레이드 선택·교체는 무작위. 숙련 봇에만 조건 규칙 추가 가능</td>
+</tr>
+<tr>
+<td>테마</td>
+<td>익숙한 판타지 던전(일단)</td>
+</tr>
+<tr>
+<td>구조</td>
+<td>규칙 계산과 화면 그리기 분리. 시뮬은 브라우저(CPU)에서 돌고 LLM은 안 씀. 서버 없음(GitHub Pages)</td>
+</tr>
+</tbody></table></div>
+<p>대시 쿨타임은 5초 안쪽에서 시작하되, 시작값일 뿐이라 DT에서 시뮬을 보며 맞춘다.</p>
+<h2>3. 모든 파트가 지킬 기준</h2>
+<p>판단이 갈릴 때 쓰는 원칙이다. 전부 아이디어 스레드에서 나온 이유에서 뽑았다.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>기준</th>
+<th>이유</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>비교할 것 하나만 다르고 나머지는 같게</td>
+<td>경험치형을 뺀 이유와 같다. 잘하는 봇이 보상을 더 받는 구조면 실력별 비교가 흐려진다</td>
+</tr>
+<tr>
+<td>실력 차이는 봇 3단계로 나눠 따로 보고, 같은 실력 안에서는 기획 수치와 선택으로 결과가 갈리게</td>
+<td>새 요소를 넣을 때 봇이 처리할 수 있는지 확인한다. 봇이 못 다루는 상황(예: 여러 발 날아오는 원거리 투사체)은 숙련 봇 규칙을 추가하거나 한계로 적는다</td>
+</tr>
+<tr>
+<td>능력치와 계산식은 단순하게</td>
+<td>읽을 게 많아지면 재미가 떨어진다는 직접 경험. 대시보드에서 수치를 바꿨을 때 담당자도 바로 따라올 수 있어야 한다</td>
+</tr>
+<tr>
+<td>판끼리 영향을 주지 않게 (영구 성장 없음)</td>
+<td>판별로 비교해야 시뮬 데이터가 의미가 있다</td>
+</tr>
+<tr>
+<td>맵과 웨이브는 미리 만든 단위로</td>
+<td>문제가 생긴 맵을 콕 집고, 고친 뒤 같은 시드로 다시 돌려 확인할 수 있어야 한다</td>
+</tr>
+<tr>
+<td>본문에는 규칙과 의도만, 숫자는 DT에만</td>
+<td>숫자가 한 곳에 있어야 대시보드 조정판과 바로 이어지고, 바꿀 때 한 곳만 고치면 된다</td>
+</tr>
+<tr>
+<td>의도는 확인할 수 있는 값으로</td>
+<td>&quot;이렇게 될 거다&quot;를 공식으로 낸 값으로 적어야 대시보드 시뮬 결과와 비교할 수 있다. 값 자체는 DT에 둔다</td>
+</tr>
+<tr>
+<td>키보드만, 마우스 조준 없음</td>
+<td>조준이 들어가면 실력 요소가 하나 더 늘고, 담당자가 터치패드로 열 수도 있다</td>
+</tr>
+<tr>
+<td>브라우저 안에서만 돌아가게</td>
+<td>서버가 없고 시뮬에 LLM을 안 쓴다. 서버나 토큰이 필요한 기능은 넣지 않는다</td>
+</tr>
+</tbody></table></div>
+<h2>4. 파트별 담당 범위</h2>
+<p>각 파트는 자기 칸의 &quot;정하는 것&quot;만 정하고, &quot;정하지 않는 것&quot;은 해당 파트로 넘긴다.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>파트</th>
+<th>정하는 것</th>
+<th>정하지 않는 것</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>콘셉트·테마</td>
+<td>게임 이름. 배경, 주인공, 적·보스 생김새와 분위기. 맵·적·카드·스킬 이름</td>
+<td>규칙, 숫자</td>
+</tr>
+<tr>
+<td>시스템</td>
+<td>전투 규칙(공격, 대시, 피격, 무적). 일반 적 종류별 행동과 예고 동작, 디버프·장판 종류. 보스 공통 규칙(보스 웨이브 시작·끝, 체력바 UI, 예고 방식, 카운터·파훼 성공 시 처리, 페이즈 전환 방식). 카드 목록과 효과 규칙, 스킬 슬롯. 봇 행동 규칙. 무한 모드에서 5층 이후 무엇이 반복되는지. 화면 흐름과 UI</td>
+<td>어떤 맵에 무엇을 배치할지, 보스별 패턴, 숫자</td>
+</tr>
+<tr>
+<td>콘텐츠 &gt; 레벨</td>
+<td>맵 10개 구성, 웨이브 1~4의 적 조합, 환경 조건 목록, 보스 배치, 층이 올라갈수록, 무한 모드에서는 반복할수록 얼마나 어려워지는지</td>
+<td>일반 적 행동, 보스 공통 규칙, 숫자</td>
+</tr>
+<tr>
+<td>콘텐츠 &gt; 보스</td>
+<td>보스 수, 보스별 경험 의도, 패턴, 파훼 방법 (의도: 보스가 없으면 판이 단조롭고, 일반 적은 2~3대면 죽어서 강해진 걸 체감할 상대가 없다. 보스마다 패턴·공격·경험이 달라 시스템이 아니라 콘텐츠로 둠)</td>
+<td>일반 적 행동, 보스 공통 규칙, 숫자</td>
+</tr>
+<tr>
+<td>DT</td>
+<td>모든 수치(캐릭터, 적, 보스, 카드, 스킬, 웨이브, 환경 조건, 봇 실력 3단계). 수치마다 의도 값과 그 계산식. 검사 규칙의 맞음 범위</td>
+<td>새 규칙이나 새 항목 추가</td>
+</tr>
+<tr>
+<td>로그</td>
+<td>기록 항목 표(언제 / 어떤 값 / 대시보드에서 뭘 보려고), 시뮬 결과 저장 형식</td>
+<td>대시보드 화면 구성</td>
+</tr>
+<tr>
+<td>대시보드</td>
+<td>화면 구성, 조정판에 올릴 수치 항목, 기획서 의도를 검사 규칙으로 바꾸는 방식과 어긋남 비교 방식, 추가로 보여줄 정보</td>
+<td>게임 규칙, 수치 값과 맞음 범위(DT), 기록 항목 정의(로그)</td>
+</tr>
+</tbody></table></div>
+<p>콘텐츠는 목차에서 묶는 이름이다. 문서는 레벨 기획서와 보스 기획서 두 개로 따로 둔다.</p>
+<p>대시보드는 기획서의 마지막 파트다. 게임을 정하는 다른 파트와 달리, 게임이 의도대로 나오는지 검사하는 도구 문서라 따로 둔다.</p>
+<h2>5. 파트끼리 주고받는 것</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>주는 쪽</th>
+<th>받는 쪽</th>
+<th>넘기는 것</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>콘셉트·테마</td>
+<td>전체</td>
+<td>맵·적·카드·스킬 이름 목록. 다른 파트는 이름을 새로 만들지 않고 이 목록을 쓴다</td>
+</tr>
+<tr>
+<td>시스템</td>
+<td>콘텐츠</td>
+<td>일반 적 종류, 보스 공통 규칙, 환경 조건이 건드릴 수 있는 규칙. 콘텐츠는 이 안에서 맵을 조합하고 보스 패턴을 만든다</td>
+</tr>
+<tr>
+<td>시스템, 콘텐츠</td>
+<td>DT</td>
+<td>규칙마다 필요한 수치 항목 이름. 본문에는 값 대신 &quot;DT: 항목명&quot;으로 가리킨다</td>
+</tr>
+<tr>
+<td>시스템, 콘텐츠, DT</td>
+<td>로그</td>
+<td>의도 값마다 &quot;대시보드에서 무엇으로 확인할지&quot; 한 줄. 로그는 이걸 보고 기록 항목을 정하고, 확인할 의도가 없는 기록 항목은 만들지 않는다</td>
+</tr>
+<tr>
+<td>로그</td>
+<td>대시보드</td>
+<td>기록 항목과 저장 형식</td>
+</tr>
+<tr>
+<td>DT</td>
+<td>대시보드</td>
+<td>조정판 수치의 기본값, 검사 규칙의 맞음 범위</td>
+</tr>
+</tbody></table></div>
+<p><strong>범위 밖 얘기가 나오면:</strong> 그 파트에서 정하지 않고 담당 파트로 넘긴다. 2번이나 3번과 부딪히면 이 문서를 먼저 고친다.</p>
+<p><strong>AI가 한 것 / 직접 정한 것:</strong> 각 파트는 작업 중 이에 해당하는 장면을 &#39;AI 역할 구분 기록하기&#39; 스레드로 보낸다. 통합할 때 그 기록을 모아 기획서 맨 앞 개요에 넣는다.</p>
+<div class="pn"><span></span><span><a href="system.html">시스템 기획 →</a></span></div>
+</main>
+</body>
+</html>
