@@ -261,7 +261,7 @@
     }
     draw.lastNow = now;
 
-    Sh.arena(ctx, s.map);
+    Sh.arena(ctx, s.map, s.floor);
     for (var k = 0; k < s.enemies.length; k++) {
       var e = s.enemies[k], def = s.dt.enemies[e.defId];
       if (e.state === 'telegraph') Sh.telegraph(ctx, e, def);   // 예고 중엔 멈춰 있어서 보간 불필요
@@ -281,6 +281,7 @@
         shown = Object.create(shown);
         shown.squash = 1 - since / SQUASH_TIME; shown.squashDir = hitDir[e2.uid] || 0;
       }
+      if (shown.baseX === undefined) { shown = Object.create(shown); shown.baseX = lerped(e2).x; }   // 좌우 방향은 떨림 빼고 실제 위치로 봄
       if (e2.type === 'boss') Sh.boss(ctx, shown, s.dt.enemies[e2.defId], since < 0.06, fxNow);
       else Sh.enemy(ctx, shown, s.dt.enemies[e2.defId], since < 0.08);
     }

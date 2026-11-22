@@ -22,6 +22,8 @@ G.UI = (function () {
     for (var id in d) if (s.dt.enemies[id] && s.dt.enemies[id].type === 'boss') return true;
     return false;
   }
+  function floorName(s, f) { var n = s.dt.common.floorNames; return (n && n[f - 1]) || s.dt.common.infiniteFloorName || ''; }
+  function effectText(c, v) { return c.label + ' ' + fmtValue(c, v); }   // 예: 최대 체력 +10
   function fmtTime(t) { var m = Math.floor(t / 60), sec = Math.floor(t % 60); return m + '분 ' + (sec < 10 ? '0' : '') + sec + '초'; }
 
   return {
@@ -46,7 +48,7 @@ G.UI = (function () {
         text(ctx, i === 0 ? 'S' : 'D', 160 + i * 34, 58, 12, '#6b7180', 'center');
       }
 
-      text(ctx, (s.infinite ? '무한 · ' : '') + s.floor + '층  웨이브 ' + s.wave + ' / ' + s.dt.common.wavesPerFloor + (isBossWave(s) ? ' (보스)' : ''), s.W - 20, 27, 18, '#e8eaf0', 'right');
+      text(ctx, (s.infinite ? '무한 · ' : '') + s.floor + '층 ' + floorName(s, s.floor) + '  웨이브 ' + s.wave + ' / ' + s.dt.common.wavesPerFloor + (isBossWave(s) ? ' (보스)' : ''), s.W - 20, 27, 18, '#e8eaf0', 'right');
 
       // 보스 체력 바(화면 아래 가운데, 보스가 12시에서 나와서 위에 두면 가려짐). 돌진 예고 중엔 아래에 슈퍼아머 게이지
       for (var b = 0; b < s.enemies.length; b++) {
@@ -69,7 +71,7 @@ G.UI = (function () {
 
     start: function (ctx, s) {
       dim(ctx, s);
-      text(ctx, '첫 테스트 판', s.W / 2, s.H / 2 - 80, 44, '#e8eaf0', 'center');
+      text(ctx, '가라앉는 늪', s.W / 2, s.H / 2 - 80, 44, '#e8eaf0', 'center');
       text(ctx, '방향키 이동   A 공격   Space 대시   S·D 스킬(첫 판은 빈칸)   P 일시정지', s.W / 2, s.H / 2 - 10, 20, '#b9bfcc', 'center');
       text(ctx, '카드 고르기: 1·2·3 또는 ←→ 후 Enter', s.W / 2, s.H / 2 + 24, 16, '#8a90a0', 'center');
       text(ctx, '5번째 웨이브는 보스. 시작 화면에서 5 를 누르면 바로 보스부터', s.W / 2, s.H / 2 + 50, 14, '#6b7180', 'center');
@@ -85,8 +87,8 @@ G.UI = (function () {
         ctx.fillStyle = '#23262e'; ctx.fillRect(x, y, w, h);
         ctx.strokeStyle = i === sel ? '#4da3ff' : '#3a3f4b'; ctx.lineWidth = i === sel ? 4 : 2; ctx.strokeRect(x, y, w, h);
         text(ctx, c.group === 'basic' ? '기본 공격 강화' : '능력치', x + w / 2, y + 36, 14, '#8a90a0', 'center');
-        text(ctx, c.label, x + w / 2, y + 110, 26, '#e8eaf0', 'center');
-        text(ctx, fmtValue(c, pick.value), x + w / 2, y + 160, 30, '#7bd88f', 'center');
+        text(ctx, c.name || c.label, x + w / 2, y + 110, 26, '#e8eaf0', 'center');
+        text(ctx, effectText(c, pick.value), x + w / 2, y + 156, 20, '#7bd88f', 'center');
         text(ctx, pick.tier + '단계', x + w / 2, y + 220, 16, ['#b9bfcc', '#6fb3ff', '#ffcf66'][pick.tier - 1], 'center');
         text(ctx, '[' + (i + 1) + ']', x + w / 2, y + h - 28, 16, '#8a90a0', 'center');
       }
@@ -127,7 +129,7 @@ G.UI = (function () {
       dim(ctx, s);
       var next = s.floor + 1, inf = next > s.dt.common.floorCount;
       text(ctx, s.floor + '층 돌파', s.W / 2, s.H / 2 - 40, 40, '#e8eaf0', 'center');
-      text(ctx, inf ? '무한 모드 · ' + next + '층으로' : next + '층으로', s.W / 2, s.H / 2 + 14, 22, '#b9bfcc', 'center');
+      text(ctx, (inf ? '무한 모드 · ' : '') + next + '층 · ' + floorName(s, next), s.W / 2, s.H / 2 + 20, 28, '#b9bfcc', 'center');
       text(ctx, 'Enter 를 눌러 계속', s.W / 2, s.H / 2 + 80, 18, '#4da3ff', 'center');
     },
 
@@ -144,7 +146,7 @@ G.UI = (function () {
       for (var i = 0; i < Math.min(r.picks.length, maxShow); i++) {
         var pk = r.picks[i], c = G.Core.cards.find(s, pk.id);
         var cx = x0 + (i % cols) * colW + 20, cy = 270 + Math.floor(i / cols) * 26;
-        text(ctx, pk.floor + '-' + pk.wave + '  ' + c.label + ' ' + fmtValue(c, pk.value) + ' (' + pk.tier + '단계)', cx, cy, 15, '#e8eaf0');
+        text(ctx, pk.floor + '-' + pk.wave + '  ' + (c.name || c.label) + ' (' + effectText(c, pk.value) + ', ' + pk.tier + '단계)', cx, cy, 13, '#e8eaf0');
       }
       if (r.picks.length > maxShow) text(ctx, '외 ' + (r.picks.length - maxShow) + '장', s.W / 2, 270 + 10 * 26, 15, '#8a90a0', 'center');
       text(ctx, r.outcome ? 'Enter 를 누르면 같은 판을 처음부터 다시 봄' : 'Enter 를 눌러 다시 시작', s.W / 2, s.H - 70, 20, '#4da3ff', 'center');

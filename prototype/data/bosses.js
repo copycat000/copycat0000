@@ -7,7 +7,7 @@ G.DT.enemies = G.DT.enemies || {};
 G.DT.enemies.B001 = {
   id: 'B001',
   type: 'boss',
-  label: '보스 1 (근접 중장형)',
+  label: '잠식된 중갑 기사',   // 보스 1 (근접 중장형). 이름 11/22 콘셉트
   bodyDiameter: 64,        // 일반 적(32)의 두 배
   hp: 600,                 // 평타 기대 피해 12.5 / 0.4초 → 쉬지 않고 맞히면 약 20초
   moveSpeed: 120,          // 플레이어(200)보다 느리게

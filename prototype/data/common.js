@@ -9,5 +9,7 @@ G.DT.common = {
   batchInterval: 10,     // 묶음 등장 간격(앞 묶음이 나온 순간부터 셈)
   batchesPerWave: 3,     // 한 웨이브의 묶음 수
   floorCount: 5,         // 이 층까지 깨면 무한 모드
-  wavesPerFloor: 5       // 한 층의 웨이브 수(5번째는 보스 웨이브)
+  wavesPerFloor: 5,      // 한 층의 웨이브 수(5번째는 보스 웨이브)
+  floorNames: ['얕은 늪', '검은 물웅덩이', '빛이 들지 않는 곳', '늪의 바닥', '잠긴 문'],   // 층 이름(11/22 콘셉트)
+  infiniteFloorName: '문 너머'   // 6층부터(무한 모드)
 };

@@ -6,7 +6,7 @@ G.DT.enemies = {
   E001: {
     id: 'E001',
     type: 'melee',          // 근거리형
-    label: '근거리형',
+    label: '잠식된 보병',   // 근거리형 (이름 11/22 콘셉트)
     bodyDiameter: 32,       // 임시값(DT 문서에 없음, 플레이어와 같게)
     hp: 30,
     moveSpeed: 160,
@@ -19,7 +19,7 @@ G.DT.enemies = {
   E002: {
     id: 'E002',
     type: 'ranged',         // 원거리형
-    label: '원거리형',
+    label: '잠식된 궁수',   // 원거리형
     bodyDiameter: 32,       // 임시값
     hp: 20,
     moveSpeed: 120,
