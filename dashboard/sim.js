@@ -13,9 +13,9 @@ G.Dash.sim = {
     { id: 'crit',      label: '치명타 확률',        unit: '%',  doc: 10,  min: 0,   max: 50,  step: 1 },
     { id: 'dashCd',    label: '대시 쿨타임',        unit: '초', doc: 1,   min: 0.5, max: 4,   step: 0.1 },
     { id: 'armor',     label: '보스 슈퍼아머',      unit: '',   doc: 30,  min: 5,   max: 80,  step: 1 },
-    { id: 'timeLimit', label: '한 층 제한 시간',    unit: '초', doc: 120, min: 60,  max: 300, step: 10 },
+    { id: 'timeLimit', label: '층당 제한 시간',    unit: '초', doc: 120, min: 60,  max: 300, step: 10 },
     { id: 'bossHp',    label: '보스 체력',          unit: '',   doc: 600, min: 200, max: 1200, step: 50 },
-    { id: 'meleeTele', label: '근거리 몹 예고 시간', unit: '초', doc: 0.6, min: 0.2, max: 1.2, step: 0.05 }
+    { id: 'meleeTele', label: '근거리형 예고 시간', unit: '초', doc: 0.6, min: 0.2, max: 1.2, step: 0.05 }
   ],
 
   docKnobs: function () {

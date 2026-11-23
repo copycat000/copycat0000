@@ -23,7 +23,7 @@
   }
   function condName(c) {
     var ch = changed(c.knobs);
-    if (!ch.length) return '문서 값';
+    if (!ch.length) return 'DT 기본값';
     return ch.map(function (k) { return k.label + ' ' + k.doc + '→' + c.knobs[k.id] + k.unit; }).join(', ');
   }
   function badCount(c) { return c.checks.filter(function (x) { return x.state === 'bad'; }).length; }
@@ -50,7 +50,7 @@
       html += '<div class="knob" id="k_' + k.id + '"><div class="top"><label for="kn_' + k.id + '">' + k.label + (k.unit ? ' (' + k.unit + ')' : '') + '</label>' +
         '<input type="number" id="kn_' + k.id + '" min="' + k.min + '" max="' + k.max + '" step="' + k.step + '" value="' + k.doc + '"></div>' +
         '<input type="range" id="kr_' + k.id + '" min="' + k.min + '" max="' + k.max + '" step="' + k.step + '" value="' + k.doc + '" aria-label="' + k.label + '">' +
-        '<div class="doc">문서 값 ' + k.doc + k.unit + '</div></div>';
+        '<div class="doc">DT 기본값 ' + k.doc + k.unit + '</div></div>';
     });
     $('knobs').innerHTML = html;
     S.KNOBS.forEach(function (k) {
@@ -75,7 +75,7 @@
   }
   function estimate() {
     var n = parseInt($('nRuns').value, 10) || 0, ms = G.Dash.lastMs || G.Dash.BASE.msPerRun || 50;
-    $('nEst').textContent = '한 번에 ' + n * 3 + '판, 대략 ' + Math.round(n * 3 * ms / 1000) + '초 (판당 ' + Math.round(ms) + 'ms 기준)';
+    $('nEst').textContent = '총 ' + n * 3 + '회, 약 ' + Math.round(n * 3 * ms / 1000) + '초';
   }
 
   // ---- 실행: 화면이 멈추지 않게 조금씩 나눠 돌림 ----
@@ -91,13 +91,13 @@
       var start = performance.now();
       while (i < jobs.length && performance.now() - start < 40) { runs.push(S.runOne(dt, jobs[i][1], jobs[i][0])); i++; }
       $('prog').firstChild.style.width = (i / jobs.length * 100) + '%';
-      $('progTxt').textContent = i + ' / ' + jobs.length + '판';
+      $('progTxt').textContent = i + ' / ' + jobs.length + '회';
       if (i < jobs.length) { setTimeout(chunk, 0); return; }
       var ms = (performance.now() - t0) / jobs.length;
       G.Dash.lastMs = ms; estimate();
       conds.push(makeCond(knobs, n, runs, ms)); cur = conds.length - 1;
       running = false; $('runBtn').disabled = false; $('prog').classList.add('hidden');
-      $('progTxt').textContent = jobs.length + '판 끝 (' + Math.round(ms * jobs.length / 1000) + '초)';
+      $('progTxt').textContent = jobs.length + '회 완료 (' + Math.round(ms * jobs.length / 1000) + '초)';
       save(); render();
     })();
   }
@@ -106,10 +106,10 @@
   function render() {
     var c = conds[cur], prev = cur > 0 ? conds[cur - 1] : null;
     var ch = changed(c.knobs);
-    $('condLine').innerHTML = '지금 보는 결과: ' + (ch.length ? ch.map(function (k) { return '<b>' + k.label + ' ' + c.knobs[k.id] + k.unit + '</b> (문서 ' + k.doc + k.unit + ')'; }).join(', ') : '<b>문서 값</b>') +
-      ', 실력마다 ' + c.n + '판, 시드 1~' + c.n + (c.ms ? ', 판당 계산 ' + Math.round(c.ms) + 'ms' : '') +
+    $('condLine').innerHTML = '지금 보는 결과: ' + (ch.length ? ch.map(function (k) { return '<b>' + k.label + ' ' + c.knobs[k.id] + k.unit + '</b> (DT ' + k.doc + k.unit + ')'; }).join(', ') : '<b>DT 기본값</b>') +
+      ', 실력별 ' + c.n + '회, 시드 1~' + c.n +
       (prev ? ', 흐린 표시는 바로 앞 조건(' + esc(condName(prev)) + ')' : '');
-    var tag = '실력마다 ' + c.n + '판';
+    var tag = '실력별 ' + c.n + '회';
     ['resTag', 'hitTag', 'waveTag', 'dpsTag', 'cardTag', 'oddTag'].forEach(function (id) { $(id).textContent = tag; });
     renderCheck(c);
     renderResults(c, prev);
@@ -121,25 +121,41 @@
   }
 
   function sevPill(x) {
-    if (x.state === 'ok') return '<span class="pill ok">맞음</span>';
+    if (x.state === 'ok') return '<span class="pill ok">일치</span>';
     if (x.state === 'none') return '<span class="pill none">범위 미정</span>';
-    return '<span class="pill l' + x.level + '">어긋남 ' + ['', '조금', '많이', '크게'][x.level] + '</span>';
+    return '<span class="pill l' + x.level + '">불일치 ' + ['', '조금', '많이', '크게'][x.level] + '</span>';
   }
   function rangeText(r) {
     if (!r.range) return '–';
     var lo = r.range[0], hi = r.range[1];
     var t = (lo !== null && hi !== null) ? lo + '~' + hi + r.unit : lo !== null ? lo + r.unit + ' 이상' : hi + r.unit + ' 이하';
-    return t + (r.temp ? '<div class="note">임시</div>' : '');
+    return t + (r.temp ? '' : '');
   }
+
+  var showOk = false;
+  document.addEventListener('click', function (e) {
+    if (e.target && e.target.id === 'okToggle') { showOk = !showOk; renderCheck(conds[cur]); }
+  });
+  // 페이지 탭
+  (function () {
+    var bar = document.getElementById('pageTabs');
+    if (!bar) return;
+    bar.addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-tab]');
+      if (!b) return;
+      Array.prototype.forEach.call(bar.querySelectorAll('button'), function (x) { x.setAttribute('aria-selected', x === b ? 'true' : 'false'); });
+      Array.prototype.forEach.call(document.querySelectorAll('.tabpanel'), function (p) { p.hidden = p.id !== b.getAttribute('data-tab'); });
+    });
+  })();
 
   function renderCheck(c) {
     var bad = badCount(c), tested = testedCount(c);
     $('checkTag').textContent = '규칙 ' + RULES.length + '개';
     $('bigCount').innerHTML = tested
-      ? '<span class="n' + (bad ? ' bad' : '') + '">' + bad + '</span><span class="of">어긋남 / 검사 ' + tested + '</span>'
-      : '<span class="of">맞음 범위가 아직 없어 검사한 규칙 없음. 잰 값은 아래에</span>';
+      ? '<span class="n' + (bad ? ' bad' : '') + '">' + bad + '</span><span class="of">불일치 / 검증 ' + tested + '</span>'
+      : '<span class="of">허용 범위가 아직 없어 검증한 규칙이 없습니다. 측정값은 아래에 있습니다.</span>';
     // 조건 목록
-    var h = '<thead><tr><th>#</th><th>조건</th><th class="r">판 수</th><th class="r">어긋남</th><th>규칙별</th></tr></thead><tbody>';
+    var h = '<thead><tr><th>#</th><th>조건</th><th class="r">플레이 횟수</th><th class="r">불일치</th><th>규칙별</th></tr></thead><tbody>';
     conds.forEach(function (k, i) {
       h += '<tr class="cond' + (i === cur ? ' sel' : '') + '" data-i="' + i + '" tabindex="0"><td class="mono">' + (i + 1) + '</td><td>' + esc(condName(k)) + '</td><td class="r mono">' + k.n + '</td>' +
         '<td class="r mono">' + (testedCount(k) ? badCount(k) + ' / ' + testedCount(k) : '–') + '</td><td><span class="dots">' +
@@ -154,16 +170,21 @@
     // 규칙별
     $('ruleTitle').textContent = (cur + 1) + '번 조건 규칙별 결과';
     var prev = cur > 0 ? conds[cur - 1] : null;
-    var t = '<thead><tr><th>규칙</th><th>기획서 문장</th><th>잰 것</th><th class="r">잰 값</th><th class="r">맞음 범위</th><th>결과</th></tr></thead><tbody>';
+    var t = '<thead><tr><th>규칙</th><th>기획서 문장</th><th>측정 항목</th><th class="r">측정값</th><th class="r">허용 범위</th><th>결과</th></tr></thead><tbody>';
     var order = c.checks.slice().sort(function (a, b) { return (b.state === 'bad' ? b.level : -1) - (a.state === 'bad' ? a.level : -1); });
     order.forEach(function (x) {
       var r = RULES.filter(function (q) { return q.id === x.id; })[0];
       var pv = prev ? prev.checks.filter(function (q) { return q.id === x.id; })[0] : null;
-      t += '<tr class="' + (x.state === 'bad' ? 'bad' : '') + '"><td><b>' + esc(r.name) + '</b><div class="note">' + esc(r.src) + '</div></td><td>"' + esc(r.sentence) + '"</td><td class="note">' + esc(r.measure) + '</td>' +
-        '<td class="r mono">' + fx(x.v) + r.unit + (pv ? '<div class="note">앞 조건 ' + fx(pv.v) + r.unit + '</div>' : '') + '</td><td class="r mono">' + rangeText(r) + '</td><td>' + sevPill(x) + (x.few ? '<div class="note">판 수가 적어 우연일 수 있음</div>' : '') + '</td></tr>';
+      t += '<tr class="' + (x.state === 'bad' ? 'bad' : 'okrow') + '"><td><b>' + esc(r.name) + '</b><div class="note">' + esc(r.src) + '</div></td><td>"' + esc(r.sentence) + '"</td><td class="note">' + esc(r.measure) + '</td>' +
+        '<td class="r mono">' + fx(x.v) + r.unit + (pv ? '<div class="note">앞 조건 ' + fx(pv.v) + r.unit + '</div>' : '') + '</td><td class="r mono">' + rangeText(r) + '</td><td>' + sevPill(x) + (x.few ? '<div class="note">플레이 횟수가 적어 우연일 수 있음</div>' : '') + '</td></tr>';
     });
     $('ruleTable').innerHTML = t + '</tbody>';
-    $('ruleNote').textContent = (RULES.some(function (r) { return r.temp; }) ? '"임시"가 붙은 맞음 범위는 기획서 문장을 숫자로 옮겨 본 임시값. 확정되면 바뀜. ' : '') + '어긋난 정도: 맞음 범위 끝에서 벗어난 양 ÷ 범위 끝 값. 10% 미만 조금, 50% 미만 많이, 그 이상 크게. 검사로는 맞음, 어긋남과 벗어난 정도까지만 확인. 원인은 값을 하나씩 바꿔 다시 돌려서 좁힘';
+    var okN = c.checks.filter(function (x) { return x.state !== 'bad'; }).length;
+    var tg = $('okToggle');
+    tg.hidden = okN === 0;
+    tg.textContent = (showOk ? '일치 항목 숨기기' : '일치 항목 보기') + ' (' + okN + '개)';
+    $('ruleTable').classList.toggle('showok', showOk);
+    $('ruleNote').textContent = (RULES.some(function (r) { return r.temp; }) ? '허용 범위는 모두 기획서 문장을 숫자로 옮긴 임시값이며, 확정되면 바뀝니다. ' : '') + '벗어난 정도는 허용 범위 끝에서 벗어난 양 ÷ 범위 끝 값이며, 10% 미만은 조금, 50% 미만은 많이, 그 이상은 크게로 표시합니다. 검증은 일치, 불일치와 벗어난 정도까지만 알려 주며, 원인은 값을 하나씩 바꿔 다시 실행하며 좁힙니다.';
   }
 
   function renderResults(c, prev) {
@@ -177,7 +198,7 @@
       h += '<div class="brow"><b>' + LV_NAME[lv] + '</b><div><div class="stack" title="클리어 ' + m.clear + ', 사망 ' + m.death + ', 시간 초과 ' + m.timeout + '">' + bar + '</div>' + gh + '</div>' +
         '<div class="nums">' + num('도달 층', m.avgFloor, p && p.avgFloor, 2) + num('받은 피해', m.avgTaken, p && p.avgTaken) + num('전투 시간', m.avgTime, p && p.avgTime, 0) + '<span>초</span></div></div>';
     });
-    $('resBars').innerHTML = h + '<p class="note">괄호 안은 바로 앞 조건. 받은 피해와 전투 시간은 판당 평균</p>';
+    $('resBars').innerHTML = h + '<p class="note">괄호 안은 바로 앞 조건의 값입니다. 받은 피해와 전투 시간은 플레이 1회당 평균입니다.</p>';
   }
 
   function renderHits(c, prev) {
@@ -186,13 +207,13 @@
     var h = '';
     LV.forEach(function (lv) {
       var m = c.M[lv], p = prev ? prev.M[lv] : null;
-      var bar = KIND.map(function (k) { var v = m.hitBy[k[0]]; return '<div style="width:' + (max ? v / max * 100 : 0) + '%;background:' + k[2] + '" title="' + k[1] + ' 판당 ' + fx(v) + '"></div>'; }).join('');
+      var bar = KIND.map(function (k) { var v = m.hitBy[k[0]]; return '<div style="width:' + (max ? v / max * 100 : 0) + '%;background:' + k[2] + '" title="' + k[1] + ' 1회당 ' + fx(v) + '"></div>'; }).join('');
       var gh = p ? '<div class="ghostline">' + KIND.map(function (k) { return '<div style="width:' + (max ? p.hitBy[k[0]] / max * 100 : 0) + '%;background:' + k[2] + '"></div>'; }).join('') + '</div>' : '';
       var rate = function (k, lab) { return '<span>' + lab + ' <b>' + pct(m.hitRate[k], 1) + '</b>' + (p ? ' <s>(' + pct(p.hitRate[k], 1) + ')</s>' : '') + '</span>'; };
       h += '<div class="brow"><b>' + LV_NAME[lv] + '</b><div><div class="hbar">' + bar + '</div>' + gh + '</div><div class="nums">' + rate('melee', '근거리') + rate('slam', '휘두르기') + rate('charge', '돌진') + '</div></div>';
     });
-    $('hitBars').innerHTML = h + '<p class="note">막대 길이는 판당 받은 피해(가장 긴 막대 ' + fx(max) + '). 맞은 비율 = 맞은 횟수 ÷ 그 공격이 나온 횟수. 원거리형은 탄이 여러 갈래라 비율 없음</p>';
-    var t = '<thead><tr><th>실력</th><th class="r">돌진 알아차림</th><th class="r">붙기로 함</th><th class="r">붙어서 깸</th><th class="r">알아차리기 전에 깨짐</th><th class="r">벽 충돌</th><th>층별 붙은 비율 (1→5층)</th></tr></thead><tbody>';
+    $('hitBars').innerHTML = h + '<p class="note">막대 길이는 플레이 1회당 받은 피해(가장 긴 막대 ' + fx(max) + '). 맞은 비율 = 맞은 횟수 ÷ 그 공격이 나온 횟수. 원거리형은 탄이 여러 갈래라 비율을 표시하지 않습니다.</p>';
+    var t = '<thead><tr><th>실력</th><th class="r">돌진 인지</th><th class="r">파훼 시도</th><th class="r">시도해서 파훼</th><th class="r">인지 전 파훼</th><th class="r">벽 충돌</th><th>층별 파훼 시도 비율 (1→5층)</th></tr></thead><tbody>';
     LV.forEach(function (lv) {
       var m = c.M[lv];
       t += '<tr><td>' + LV_NAME[lv] + '</td><td class="r mono">' + m.chargeSeen + '</td><td class="r mono">' + m.chargeEngage + '</td><td class="r mono">' + m.breakEngaged + '</td><td class="r mono">' + m.breakEarly +
@@ -224,7 +245,7 @@
         s.v.forEach(function (v, i) {
           var pv = ps ? ps[k].v[i] : 0;
           if (ps && pv) svg += '<rect x="' + (x(i) - bw * 1.5 + k * bw) + '" y="' + y(pv) + '" width="' + (bw - 1) + '" height="' + (T + ih - y(pv)) + '" fill="none" stroke="var(--ghost)" stroke-dasharray="2 2"/>';
-          if (v) svg += '<rect x="' + (x(i) - bw * 1.5 + k * bw) + '" y="' + y(v) + '" width="' + (bw - 1) + '" height="' + (T + ih - y(v)) + '" fill="' + LV_COLOR[s.lv] + '"><title>' + LV_NAME[s.lv] + ' ' + Math.floor(i / 5 + 1) + '층 ' + (i % 5 + 1) + '웨이브: ' + v + '판 (사망 ' + c.M[s.lv].waveDead[i] + ', 시간 초과 ' + c.M[s.lv].waveTimeout[i] + ')</title></rect>';
+          if (v) svg += '<rect x="' + (x(i) - bw * 1.5 + k * bw) + '" y="' + y(v) + '" width="' + (bw - 1) + '" height="' + (T + ih - y(v)) + '" fill="' + LV_COLOR[s.lv] + '"><title>' + LV_NAME[s.lv] + ' ' + Math.floor(i / 5 + 1) + '층 ' + (i % 5 + 1) + '웨이브: ' + v + '회 (사망 ' + c.M[s.lv].waveDead[i] + ', 시간 초과 ' + c.M[s.lv].waveTimeout[i] + ')</title></rect>';
         });
       });
     } else {
@@ -236,14 +257,14 @@
       if (ps) ps.forEach(function (s) { svg += path(s, true); });
       cs.forEach(function (s) {
         svg += path(s, false);
-        s.v.forEach(function (v, i) { if (v === null || s.n[i] < 5) return; svg += '<circle cx="' + x(i) + '" cy="' + y(v) + '" r="2.5" fill="' + LV_COLOR[s.lv] + '"><title>' + LV_NAME[s.lv] + ' ' + Math.floor(i / 5 + 1) + '층 ' + (i % 5 + 1) + '웨이브: ' + fx(v) + (waveKey === 'time' ? '초' : '') + ' (' + s.n[i] + '판)</title></circle>'; });
+        s.v.forEach(function (v, i) { if (v === null || s.n[i] < 5) return; svg += '<circle cx="' + x(i) + '" cy="' + y(v) + '" r="2.5" fill="' + LV_COLOR[s.lv] + '"><title>' + LV_NAME[s.lv] + ' ' + Math.floor(i / 5 + 1) + '층 ' + (i % 5 + 1) + '웨이브: ' + fx(v) + (waveKey === 'time' ? '초' : '') + ' (' + s.n[i] + '회)</title></circle>'; });
       });
     }
     $('waveChart').innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="웨이브별 그래프">' + svg + '</svg>';
     $('waveLegend').innerHTML = LV.map(function (lv) { return '<span><i style="background:' + LV_COLOR[lv] + '"></i>' + LV_NAME[lv] + '</span>'; }).join('') + (prev ? '<span><i class="ghost"></i>바로 앞 조건</span>' : '');
-    $('waveNote').textContent = waveKey === 'time' ? '웨이브를 끝낸 판만 평균. 그 웨이브까지 간 판이 5판 미만이면 표시 안 함. 점에 올리면 판 수 표시'
+    $('waveNote').textContent = waveKey === 'time' ? '웨이브를 클리어한 플레이만 평균을 냅니다. 그 웨이브까지 간 플레이가 5회 미만이면 표시하지 않습니다. 점에 마우스를 올리면 플레이 횟수가 표시됩니다.'
       : waveKey === 'hp' ? '웨이브를 끝냈을 때 남은 체력 평균(최대 체력 100, 카드로 늘 수 있음). 웨이브 사이 회복 없음'
-      : '판이 끝난 웨이브. 사망과 시간 초과를 합친 판 수. 막대에 올리면 나눠서 표시';
+      : '플레이가 끝난 웨이브입니다. 사망과 시간 초과를 합친 횟수이며, 막대에 마우스를 올리면 나눠서 표시됩니다.';
   }
 
   function renderDps(c, prev) {
@@ -255,9 +276,9 @@
       var m = c.M[lv], p = prev ? prev.M[lv] : null;
       h += '<div class="brow"><b>' + LV_NAME[lv] + '</b><div class="meter"><div class="fill" style="width:' + (m.dps / max * 100) + '%;background:' + LV_COLOR[lv] + '"></div>' +
         '<div class="mark" style="left:' + (dtDps / max * 100) + '%" title="DT 계산값 ' + fx(dtDps) + '"></div>' + (p ? '<div class="gm" style="left:' + (p.dps / max * 100) + '%" title="앞 조건 ' + fx(p.dps) + '"></div>' : '') + '</div>' +
-        '<div class="nums"><span>초당 피해 <b>' + fx(m.dps) + '</b> / ' + fx(dtDps) + ' (' + pct(m.dps / dtDps) + ')</span><span>헛스윙 <b>' + pct(m.whiff, 1) + '</b></span></div></div>';
+        '<div class="nums"><span>초당 피해 <b>' + fx(m.dps) + '</b> / ' + fx(dtDps) + ' (' + pct(m.dps / dtDps) + ')</span><span>빗나간 공격 <b>' + pct(m.whiff, 1) + '</b></span></div></div>';
     });
-    $('dpsBars').innerHTML = h + '<p class="note">검은 세로선 = DT 계산값 ' + fx(dtDps) + '. 실제 초당 피해 = 판 전체에 준 피해 ÷ 전투 시간(카드, 치명타 포함). 헛스윙 = 아무도 안 맞은 평타 ÷ 전체 평타.' + (prev ? ' 회색 선은 바로 앞 조건.' : '') + '</p>';
+    $('dpsBars').innerHTML = h + '<p class="note">검은 세로선 = DT 계산값 ' + fx(dtDps) + '. 실제 초당 피해 = 플레이 전체에 준 피해 ÷ 전투 시간(카드, 치명타 포함). 빗나간 공격 = 아무도 맞지 않은 평타 ÷ 전체 평타.' + (prev ? ' 회색 선은 바로 앞 조건.' : '') + '</p>';
   }
 
   function renderCards(c) {
@@ -277,7 +298,7 @@
       var mx = 0.3; rows.forEach(function (r) { if (!isNaN(r.d)) mx = Math.max(mx, Math.abs(r.d)); });
       h += '<div class="ccol"><h3>' + LV_NAME[lv] + '</h3>' + rows.map(function (r) {
         var w = isNaN(r.d) ? 0 : Math.abs(r.d) / mx * 50, left = r.d >= 0 ? 50 : 50 - w;
-        return '<div class="crow' + (r.weak ? ' weak' : '') + '" title="' + esc(r.k.label) + ': 고른 판 ' + r.n + '판"><span>' + esc(r.k.label) + '</span><div class="cbar"><div class="mid"></div><div class="b" style="left:' + left + '%;width:' + w + '%;background:' + (r.d >= 0 ? 'var(--clear)' : 'var(--death)') + '"></div></div><span class="d">' + (isNaN(r.d) ? '–' : (r.d >= 0 ? '+' : '') + Math.round(r.d * 100) + '%p') + '</span></div>';
+        return '<div class="crow' + (r.weak ? ' weak' : '') + '" title="' + esc(r.k.label) + ': 고른 플레이 ' + r.n + '회"><span>' + esc(r.k.label) + '</span><div class="cbar"><div class="mid"></div><div class="b" style="left:' + left + '%;width:' + w + '%;background:' + (r.d >= 0 ? 'var(--clear)' : 'var(--death)') + '"></div></div><span class="d">' + (isNaN(r.d) ? '–' : (r.d >= 0 ? '+' : '') + Math.round(r.d * 100) + '%p') + '</span></div>';
       }).join('') + '</div>';
     });
     $('cardGrid').innerHTML = h;
@@ -305,18 +326,18 @@
         var t = val(r), out = t < lo || t > hi, to = r.outcome === 'timeout';
         if (!out && !to) return;
         odd.push({ r: r, v: t, out: out, to: to });
-        svg += '<a href="' + replayUrl(c, r) + '" target="_blank"><circle cx="' + x(t) + '" cy="' + (cy + (to ? -14 : 14)) + '" r="3.5" fill="' + (to ? 'var(--timeout)' : col) + '"><title>' + LV_NAME[lv] + ' 시드 ' + r.seed + ': ' + fx(t) + (oddKey === 'time' ? '초' : '') + (to ? ' (시간 초과)' : '') + ', 누르면 다시 보기</title></circle></a>';
+        svg += '<a href="' + replayUrl(c, r) + '" target="_blank"><circle cx="' + x(t) + '" cy="' + (cy + (to ? -14 : 14)) + '" r="3.5" fill="' + (to ? 'var(--timeout)' : col) + '"><title>' + LV_NAME[lv] + ' 시드 ' + r.seed + ': ' + fx(t) + (oddKey === 'time' ? '초' : '') + (to ? ' (시간 초과)' : '') + ', 누르면 플레이 재생</title></circle></a>';
       });
     });
     $('oddChart').innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="실력별 상자 그림">' + svg + '</svg>' +
-      '<p class="note">상자 = 가운데 절반의 판, 굵은 선 = 가운데 값. 상자 밖으로 상자 길이의 1.5배 넘게 떨어진 판이 튀는 판. 위쪽 노란 점 = 시간 초과 판, 아래쪽 점 = 튀는 판.</p>';
+      '<p class="note">상자는 가운데 절반의 플레이, 굵은 선은 가운데 값입니다. 상자 밖으로 상자 길이의 1.5배 넘게 떨어진 플레이를 결과가 크게 다른 플레이로 표시합니다. 위쪽 노란 점은 시간 초과된 플레이, 아래쪽 점은 결과가 크게 다른 플레이입니다.</p>';
     var h = '';
     LV.forEach(function (lv) {
       var o = odd.filter(function (d) { return d.r.level === lv; });
       var nOut = o.filter(function (d) { return d.out; }).length, nTo = o.filter(function (d) { return d.to; }).length;
-      h += '<div style="margin-top:10px"><b style="font-size:13px">' + LV_NAME[lv] + '</b> <span class="note">튀는 판 ' + nOut + ', 시간 초과 ' + nTo + '</span><div class="odd">' +
-        o.slice(0, 40).map(function (d) { return '<a class="' + (d.to ? 'to' : '') + '" href="' + replayUrl(c, d.r) + '" target="_blank">시드 ' + d.r.seed + ', ' + fx(d.v, 0) + (oddKey === 'time' ? '초' : '') + (d.to ? ' 시간 초과' : '') + '</a>'; }).join('') +
-        (o.length > 40 ? '<span class="note">외 ' + (o.length - 40) + '판</span>' : '') + '</div></div>';
+      h += '<div style="margin-top:10px"><b style="font-size:13px">' + LV_NAME[lv] + '</b> <span class="note">결과가 크게 다른 플레이 ' + nOut + ', 시간 초과 ' + nTo + '</span><div class="odd">' +
+        o.slice(0, 10).map(function (d) { return '<a class="' + (d.to ? 'to' : '') + '" href="' + replayUrl(c, d.r) + '" target="_blank">시드 ' + d.r.seed + ', ' + (d.to ? d.r.floor + '층에서 시간 초과' : fx(d.v, 0) + (oddKey === 'time' ? '초' : '')) + '</a>'; }).join('') +
+        (o.length > 10 ? '<span class="note">외 ' + (o.length - 10) + '회</span>' : '') + '</div></div>';
     });
     $('oddList').innerHTML = h;
   }

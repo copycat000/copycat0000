@@ -5,15 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>가라앉는 늪</title>
 <style>
-  html, body { margin: 0; height: 100%; background: #0d0e11; }
-  body { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #b9bfcc; font: 13px system-ui, "Malgun Gothic", sans-serif; }
-  canvas { width: min(100vw, calc((100vh - 48px) * 16 / 9)); height: auto; aspect-ratio: 16 / 9; display: block; outline: none; }
-  .botbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; padding: 0 16px; }
-  .botbar select, .botbar input, .botbar button { font: inherit; color: #e8eaf0; background: #17191f; border: 1px solid #2b2f39; border-radius: 6px; padding: 3px 8px; }
-  .botbar input { width: 110px; }
-  .botbar a { color: #4da3ff; }
+  html, body { margin: 0; min-height: 100%; background: #0d0e11; }
+  body { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 12px 0; min-height: 100vh; box-sizing: border-box; color: #b9bfcc; font: 13px system-ui, "Malgun Gothic", sans-serif; }
+  canvas { width: min(calc(100vw - 32px), calc((100vh - 170px) * 16 / 9), 1152px); height: auto; aspect-ratio: 16 / 9; display: block; outline: none; border-radius: 6px; }
+  .topbar { width: min(calc(100vw - 32px), calc((100vh - 170px) * 16 / 9), 1152px); display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+  .topbar a { color: #4da3ff; text-decoration: none; }
+  .topbar b { color: #e8eaf0; font-size: 15px; }
+  .panels { width: min(calc(100vw - 32px), calc((100vh - 170px) * 16 / 9), 1152px); display: flex; gap: 12px; flex-wrap: wrap; }
+  .box { flex: 1 1 320px; background: #14161b; border: 1px solid #2b2f39; border-radius: 8px; padding: 8px 12px; box-sizing: border-box; }
+  .box h2 { margin: 0 0 6px; font-size: 13px; font-weight: 600; color: #e8eaf0; }
+  .box .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .box label { display: flex; gap: 6px; align-items: center; }
+  .box select, .box input, .box button { font: inherit; color: #e8eaf0; background: #1d2027; border: 1px solid #2b2f39; border-radius: 6px; padding: 3px 8px; }
+  .box input { width: 60px; }
+  .box button { cursor: pointer; }
+  .keylist { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, max-content); gap: 3px 16px; font-size: 12px; }
+  .keylist kbd { display: inline-block; min-width: 18px; text-align: center; margin-right: 6px; padding: 0 4px; border: 1px solid #3a3f4b; border-radius: 4px; background: #1d2027; color: #e8eaf0; font: 12px ui-monospace, monospace; }
+  .hint { margin: 4px 0 0; color: #8a90a0; font-size: 12px; }
   .stage { position: relative; }
-  .soundbox { position: absolute; left: 50%; top: 72%; transform: translateX(-50%); gap: 14px; align-items: center; color: #b9bfcc; font-size: 14px; }
+  .soundbox { position: absolute; left: 50%; top: 80%; transform: translateX(-50%); gap: 14px; align-items: center; color: #b9bfcc; font-size: 14px; }
   .soundbox button { font: inherit; color: #e8eaf0; background: #23262e; border: 1px solid #3a3f4b; border-radius: 6px; padding: 5px 12px; cursor: pointer; }
   .soundbox button[aria-pressed="false"] { color: #8a90a0; }
   .soundbox label { display: flex; gap: 8px; align-items: center; }
@@ -21,6 +31,7 @@
 </style>
 </head>
 <body>
+<div class="topbar"><a href="../">← 처음으로</a><b>가라앉는 늪</b><a href="bot.html">봇 시뮬레이션 →</a></div>
 <div class="stage">
 <canvas id="game" tabindex="0"></canvas>
 <div id="soundBox" class="soundbox" style="display:none">
@@ -28,14 +39,27 @@
   <label>볼륨 <input type="range" min="0" max="100" step="1" aria-label="볼륨"></label>
 </div>
 </div>
-<div class="botbar">
-  봇 다시 보기
-  <select id="botLv"><option value="skilled">숙련</option><option value="mid">중간</option><option value="novice">초보</option></select>
-  시드 <input id="botSeed" type="number" min="0" value="1">
-  <button id="botGo">보기</button>
-  <button id="humanGo">사람이 하기</button>
-  | <a href="bot.html">대량 실행</a>
-  | <a href="../">처음으로</a>
+<div class="panels">
+  <section class="box">
+    <h2>봇 플레이 재생</h2>
+    <div class="row">
+      <label>실력 <select id="botLv"><option value="skilled">숙련</option><option value="mid">중간</option><option value="novice">초보</option></select></label>
+      <label>시드 <input id="botSeed" type="number" min="0" value="1"></label>
+      <button id="botGo">재생</button>
+      <button id="humanGo">직접 플레이</button>
+    </div>
+  </section>
+  <section class="box">
+    <h2>비교용 키</h2>
+    <ul class="keylist">
+      <li><kbd>T</kbd>방향 표시 회전</li>
+      <li><kbd>B</kbd>입력 미리 받기</li>
+      <li><kbd>H</kbd>히트스톱</li>
+      <li><kbd>K</kbd>넉백</li>
+      <li><kbd>L</kbd>밀려나는 동안 조작 불가</li>
+    </ul>
+    <p class="hint">기본값에서 변경한 항목은 게임 화면 오른쪽 아래에 표시</p>
+  </section>
 </div>
 
 <!-- DT 데이터 -->

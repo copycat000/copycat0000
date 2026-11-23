@@ -13,48 +13,64 @@
   :root[data-theme="dark"] { --bg:#0f1115; --card:#171a20; --line:#2a2f38; --text:#e8eaf0; --sub:#9aa2b1; --accent:#6fa8dc; }
   * { box-sizing: border-box; }
   body { margin:0; background:var(--bg); color:var(--text); font:15px/1.6 "IBM Plex Sans KR", system-ui, "Malgun Gothic", sans-serif; }
-  main { max-width:760px; margin:0 auto; padding:56px 16px 64px; }
-  h1 { font-size:28px; margin:0 0 6px; }
-  .sub { color:var(--sub); margin:0 0 36px; }
-  a.card { display:block; text-decoration:none; color:inherit; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:20px 22px; margin-bottom:14px; transition:border-color .15s; }
+  main { max-width:960px; margin:0 auto; padding:48px 16px 64px; }
+  .hero { display:grid; grid-template-columns: 1fr 1.25fr; gap:32px; align-items:center; margin-bottom:36px; }
+  .label { color:var(--accent); font-weight:700; font-size:13px; margin:0 0 6px; }
+  h1 { font-size:32px; line-height:1.3; margin:0 0 12px; }
+  .lead { margin:0 0 14px; }
+  .meta { color:var(--sub); font-size:14px; margin:0; }
+  .shot { width:100%; border-radius:10px; border:1px solid var(--line); display:block; }
+  .order { color:var(--sub); font-size:14px; margin:0 0 12px; }
+  .order b { color:var(--text); font-weight:500; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  a.card { display:flex; flex-direction:column; text-decoration:none; color:inherit; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:20px 22px; transition:border-color .15s; }
   a.card:hover { border-color:var(--accent); }
   .num { color:var(--accent); font-weight:700; font-size:13px; }
   .card h2 { font-size:19px; margin:2px 0 6px; }
-  .card p { margin:0; color:var(--sub); }
-  .go { display:inline-block; margin-top:10px; color:var(--accent); font-weight:500; font-size:14px; }
+  .card p { margin:0 0 10px; color:var(--sub); font-size:14px; flex:1; }
+  .go { color:var(--accent); font-weight:500; font-size:14px; }
+  @media (max-width: 720px) { .hero, .grid { grid-template-columns:1fr; } .hero { gap:20px; } }
 </style>
 </head>
 <body>
 <main>
-  <h1>가라앉는 늪</h1>
-  <p class="sub">액션 로그라이트 기획 포트폴리오<br>AI를 활용한 개인 프로젝트</p>
+  <section class="hero">
+    <div>
+      <p class="label">액션 로그라이트 기획 포트폴리오</p>
+      <h1>가라앉는 늪</h1>
+      <p class="lead">늪의 근원을 찾아 던전으로 들어간 탐사대원이, 아래로 내려갈수록 늪에 동화되는 액션 로그라이트입니다.</p>
+      <p class="meta">기획서, 브라우저 프로토타입, 봇 시뮬레이션 밸런스 대시보드<br>AI를 활용한 개인 프로젝트 / 타디온</p>
+    </div>
+    <img class="shot" src="images/play.jpg" alt="프로토타입 보스전 화면">
+  </section>
 
-  <a class="card" href="docs/">
-    <div class="num">01</div>
-    <h2>기획서</h2>
-    <p>콘셉트, 시스템, 레벨, 보스, DT, 대시보드</p>
-    <span class="go">기획서 보기 →</span>
-  </a>
-
-  <a class="card" href="prototype/">
-    <div class="num">02</div>
-    <h2>프로토타입</h2>
-    <p>브라우저에서 바로 플레이, 봇 플레이 다시보기<br>방향키 이동, A 공격, Space 대시, S, D 스킬</p>
-    <span class="go">플레이하기 →</span>
-  </a>
-
-  <a class="card" href="dashboard/">
-    <div class="num">03</div>
-    <h2>밸런스 대시보드</h2>
-    <p>수치를 바꿔 실력별 봇 시뮬레이션, 결과를 기획 의도와 비교</p>
-    <span class="go">대시보드 열기 →</span>
-  </a>
-  <a class="card" href="notes/">
-    <div class="num">04</div>
-    <h2>작업 기록</h2>
-    <p>AI 역할 구분, 로그 기록 항목, QA, 프로토타입 메모</p>
-    <span class="go">기록 보기 →</span>
-  </a>
+  <p class="order">보는 순서: <b>기획서</b> → <b>프로토타입</b> → <b>밸런스 대시보드</b></p>
+  <div class="grid">
+    <a class="card" href="docs/">
+      <div class="num">01</div>
+      <h2>기획서</h2>
+      <p>콘셉트와 테마, 통합 기획서, 시스템, 레벨, 보스, DT, 대시보드 기획서</p>
+      <span class="go">기획서 보기 →</span>
+    </a>
+    <a class="card" href="prototype/">
+      <div class="num">02</div>
+      <h2>프로토타입</h2>
+      <p>브라우저에서 바로 플레이하고, 봇의 플레이를 다시 볼 수 있습니다.<br>방향키 이동, A 공격, Space 대시, S, D 스킬</p>
+      <span class="go">플레이하기 →</span>
+    </a>
+    <a class="card" href="dashboard/">
+      <div class="num">03</div>
+      <h2>밸런스 대시보드</h2>
+      <p>수치를 바꿔 실력별 봇으로 시뮬레이션하고, 결과를 기획 의도와 비교합니다.</p>
+      <span class="go">대시보드 열기 →</span>
+    </a>
+    <a class="card" href="notes/">
+      <div class="num">04</div>
+      <h2>작업 기록</h2>
+      <p>AI 역할 구분, 로그 기록 항목, QA 기록, 프로토타입 개발 기록</p>
+      <span class="go">기록 보기 →</span>
+    </a>
+  </div>
 </main>
 </body>
 </html>

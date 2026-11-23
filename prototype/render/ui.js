@@ -41,7 +41,7 @@ G.UI = (function () {
       ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fillRect(16, 46, 120, 14);
       ctx.fillStyle = ready ? '#4da3ff' : '#2b4a6b';
       ctx.fillRect(16, 46, 120 * (1 - p.dashCd / p.dash.cooldown), 14);
-      text(ctx, ready ? '대시 (Space)' : '대시 ' + p.dashCd.toFixed(1), 22, 53, 11);
+      text(ctx, ready ? '대시 (Space)' : '대시 ' + p.dashCd.toFixed(1), 22, 53, 12);
 
       // 스킬 2칸: 칸 안에 키, 아래에 스킬 이름. 쿨타임 중이면 남은 만큼 어둡게 덮고 남은 초
       for (var i = 0; i < 2; i++) {
@@ -80,11 +80,15 @@ G.UI = (function () {
 
     start: function (ctx, s) {
       dim(ctx, s);
-      text(ctx, '가라앉는 늪', s.W / 2, s.H / 2 - 80, 44, '#e8eaf0', 'center');
-      text(ctx, '방향키 이동   A 공격   Space 대시   S, D 스킬   P 일시정지   M 소리', s.W / 2, s.H / 2 - 10, 20, '#b9bfcc', 'center');
-      text(ctx, '카드 고르기: 1, 2, 3 또는 ←→ 후 Enter', s.W / 2, s.H / 2 + 24, 16, '#8a90a0', 'center');
-      text(ctx, '5번째 웨이브는 보스. 시작 화면에서 5 를 누르면 바로 보스부터', s.W / 2, s.H / 2 + 50, 14, '#6b7180', 'center');
-      text(ctx, 'Enter 를 눌러 시작', s.W / 2, s.H / 2 + 90, 22, '#4da3ff', 'center');
+      text(ctx, '가라앉는 늪', s.W / 2, 130, 48, '#e8eaf0', 'center');
+      var keys = [['방향키', '이동'], ['A', '기본 공격'], ['Space', '대시'], ['S, D', '스킬'], ['1, 2, 3 또는 ←→ 후 Enter', '카드 선택'], ['P', '일시정지'], ['M', '소리 켜기, 끄기']];
+      for (var i = 0; i < keys.length; i++) {
+        var ky = 205 + i * 37;
+        text(ctx, keys[i][0], s.W / 2 - 18, ky, 22, '#e8eaf0', 'right');
+        text(ctx, keys[i][1], s.W / 2 + 18, ky, 22, '#b9bfcc', 'left');
+      }
+      text(ctx, 'Enter: 게임 시작', s.W / 2, 485, 26, '#4da3ff', 'center');
+      text(ctx, '5: 보스전부터 시작 (테스트용)', s.W / 2, s.H - 34, 18, '#8a90a0', 'center');
     },
 
     card: function (ctx, s, sel, slotFor, slotSel) {
@@ -101,7 +105,7 @@ G.UI = (function () {
         var ix = x + 24, iy = y + 40, iw = w - 48, ih = 140;
         // 종류별 색: 시안 생존, 마젠타 공격, 옐로 평타(CMYK에서 검정 뺀 세 색)
         ctx.fillStyle = CARD_COLOR[c.color] || '#1a1c22'; ctx.fillRect(ix, iy, iw, ih);
-        text(ctx, '카드 그림 자리', x + w / 2, iy + ih / 2, 13, 'rgba(0,0,0,0.45)', 'center');
+        
         text(ctx, c.name || c.label, x + w / 2, y + 212, 24, '#e8eaf0', 'center');
         text(ctx, effectText(c, pick.value), x + w / 2, y + 248, 18, '#7bd88f', 'center');
         if (sdef) text(ctx, '쿨타임 ' + +G.Core.skills.cooldown(s, sdef).toFixed(1) + '초', x + w / 2, y + 285, 15, '#b9bfcc', 'center');
@@ -119,7 +123,7 @@ G.UI = (function () {
           ctx.strokeStyle = k === slotSel ? '#4da3ff' : '#3a3f4b'; ctx.lineWidth = k === slotSel ? 4 : 2; ctx.strokeRect(bx2, by2, 220, 120);
           text(ctx, (k === 0 ? 'S' : 'D') + '  |  스킬 ' + (k + 1), bx2 + 110, by2 + 32, 18, '#8a90a0', 'center');
           text(ctx, cur ? s.dt.skills.list[cur.id].label : '빈칸', bx2 + 110, by2 + 68, 22, cur ? '#e8eaf0' : '#6b7180', 'center');
-          if (cur) text(ctx, '바꾸면 없어짐', bx2 + 110, by2 + 98, 13, '#ff9a8a', 'center');
+          if (cur) text(ctx, '바꾸면 이 스킬은 사라짐', bx2 + 110, by2 + 98, 13, '#ff9a8a', 'center');
         }
         text(ctx, 'S, D 또는 ←→ 후 Enter   Esc 카드 다시 고르기', s.W / 2, 430, 16, '#8a90a0', 'center');
       }
@@ -127,17 +131,17 @@ G.UI = (function () {
 
     // 비교 테스트용 켜고 끄는 항목 표시(오른쪽 아래)
     testToggles: function (ctx, s, flags) {
-      var rows = [['T 방향 표시 부드럽게', flags.smoothFacing], ['B 입력 미리 받기', flags.buffer], ['H 히트스톱', flags.hitstop], ['K 넉백(규칙)', flags.knockback], ['L 밀리는 동안 조작 불가(규칙)', flags.lockMove]];
+      var rows = [['T 방향 표시 부드럽게', flags.smoothFacing, true], ['B 입력 미리 받기', flags.buffer, false], ['H 히트스톱', flags.hitstop, false], ['K 넉백(규칙)', flags.knockback, true], ['L 밀리는 동안 조작 불가(규칙)', flags.lockMove, true]].filter(function (r) { return !!r[1] !== r[2]; });
       for (var i = 0; i < rows.length; i++) {
         text(ctx, rows[i][0] + ': ' + (rows[i][1] ? '켜짐' : '꺼짐'), s.W - 16, s.H - 18 - (rows.length - 1 - i) * 18, 13, rows[i][1] ? '#7bd88f' : '#8a90a0', 'right');
       }
     },
 
-    // 봇 다시 보기 표시(왼쪽 아래): 실력, 시드, 이 층 지난 시간 / 제한 시간
+    // 봇 플레이 재생 표시(왼쪽 아래): 실력, 시드, 이 층 지난 시간 / 제한 시간
     botTag: function (ctx, s, bot) {
       var lim = bot.cfg.floorTimeLimit, used = s.time - bot.floorStart;
-      text(ctx, '봇 다시 보기  |  ' + bot.cfg.levels[bot.level].label + '  |  시드 ' + s.seed, 16, s.H - 36, 14, '#ffcf66');
-      text(ctx, '이 층 ' + used.toFixed(0) + '초 / 제한 ' + lim + '초   피하기 ' + bot.stats.dodges + '번', 16, s.H - 16, 13, used > lim * 0.8 ? '#ff7a7a' : '#b9bfcc');
+      text(ctx, '봇 플레이 재생  |  ' + bot.cfg.levels[bot.level].label + '  |  시드 ' + s.seed, 16, s.H - 36, 14, '#ffcf66');
+      text(ctx, '이 층 ' + used.toFixed(0) + '초 / 제한 ' + lim + '초   회피 ' + bot.stats.dodges + '회', 16, s.H - 16, 13, used > lim * 0.8 ? '#ff7a7a' : '#b9bfcc');
     },
 
     // 봇이 알아차린 공격 위에 "!" 표시. 노란색 = 피하는 중, 하늘색 = 돌진을 깎으러 붙음
@@ -153,7 +157,7 @@ G.UI = (function () {
     pause: function (ctx, s) {
       dim(ctx, s);
       text(ctx, '일시정지', s.W / 2, s.H / 2 - 20, 40, '#e8eaf0', 'center');
-      text(ctx, 'P 또는 Esc 로 계속', s.W / 2, s.H / 2 + 30, 18, '#4da3ff', 'center');
+      text(ctx, 'P 또는 Esc를 눌러 계속', s.W / 2, s.H / 2 + 30, 18, '#4da3ff', 'center');
     },
 
     floor: function (ctx, s) {
@@ -161,13 +165,13 @@ G.UI = (function () {
       var next = s.floor + 1, inf = next > s.dt.common.floorCount;
       text(ctx, s.floor + '층 돌파', s.W / 2, s.H / 2 - 40, 40, '#e8eaf0', 'center');
       text(ctx, (inf ? '무한 모드  |  ' : '') + next + '층  |  ' + floorName(s, next), s.W / 2, s.H / 2 + 20, 28, '#b9bfcc', 'center');
-      text(ctx, 'Enter 를 눌러 계속', s.W / 2, s.H / 2 + 80, 18, '#4da3ff', 'center');
+      text(ctx, 'Enter를 눌러 계속', s.W / 2, s.H / 2 + 80, 18, '#4da3ff', 'center');
     },
 
     result: function (ctx, s) {
       dim(ctx, s);
       var r = s.result;
-      var OUT = { death: '사망', clear: '클리어 (5층 돌파)', timeout: '시간 초과 (못 깬 것)' };
+      var OUT = { death: '사망', clear: '클리어 (5층 돌파)', timeout: '시간 초과' };
       text(ctx, r.outcome ? '결과  |  봇 ' + s.dt.bots.levels[r.botLevel].label + '  |  ' + OUT[r.outcome] : '결과', s.W / 2, 120, r.outcome ? 32 : 40, '#e8eaf0', 'center');
       if (r.outcome) text(ctx, '시드 ' + r.seed, s.W / 2, 150, 14, '#8a90a0', 'center');
       text(ctx, '도달: ' + (s.infinite ? '무한 | ' : '') + r.floor + '층 웨이브 ' + r.wave + '    걸린 시간: ' + fmtTime(r.time), s.W / 2, 180, 20, '#b9bfcc', 'center');
@@ -180,7 +184,7 @@ G.UI = (function () {
         text(ctx, pk.floor + '-' + pk.wave + '  ' + (c.name || c.label) + (c.group === 'skill' ? ' (스킬, ' + (pk.slot === 1 ? 'D' : 'S') + '칸)' : ' (' + effectText(c, pk.value) + ', ' + pk.tier + '단계)'), cx, cy, 13, '#e8eaf0');
       }
       if (r.picks.length > maxShow) text(ctx, '외 ' + (r.picks.length - maxShow) + '장', s.W / 2, 270 + 10 * 26, 15, '#8a90a0', 'center');
-      text(ctx, r.outcome ? 'Enter 를 누르면 같은 판을 처음부터 다시 봄' : 'Enter 를 눌러 다시 시작', s.W / 2, s.H - 70, 20, '#4da3ff', 'center');
+      text(ctx, r.outcome ? 'Enter: 같은 플레이 다시 재생' : 'Enter를 눌러 다시 시작', s.W / 2, s.H - 70, 20, '#4da3ff', 'center');
     }
   };
 })();

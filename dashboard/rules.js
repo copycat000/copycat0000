@@ -15,12 +15,12 @@ G.Dash.RULES = [
 
   { id: 'R2', name: '1층 보스 처치 시간', src: 'DT: 보스 체력',
     sentence: '카드 없이 약 23초',
-    measure: '1층 보스 웨이브 평균 걸린 시간(중간 봇)', unit: '초',
+    measure: '1층 보스 웨이브 평균 소요 시간(중간 봇)', unit: '초',
     get: function (M) { return M.mid.boss1; },
     range: [20, 26], temp: true },
 
   { id: 'R3', name: '중간 봇 근거리형 예고', src: 'DT: 봇 실력',
-    sentence: '중간은 근거리형 예고를 못 피한다',
+    sentence: '중간은 근거리형 예고를 피하지 못한다',
     measure: '중간 봇이 근거리형 공격에 맞은 비율', unit: '%',
     get: function (M) { return M.mid.hitRate.melee * 100; },
     range: [50, null], temp: true },
@@ -37,27 +37,27 @@ G.Dash.RULES = [
     get: function (M) { return M.novice.hitRate.slam * 100; },
     range: [70, null], temp: true },
 
-  { id: 'R5', name: '웨이브 4 묶음 겹침', src: 'DT: 묶음 간격',
-    sentence: '웨이브 4는 앞 묶음을 못 잡고 겹친다',
-    measure: '웨이브 4에서 앞 묶음이 남은 채 다음 묶음이 나온 비율(중간 봇)', unit: '%',
+  { id: 'R5', name: '웨이브 4 스폰 그룹 겹침', src: 'DT: 스폰 그룹 간격',
+    sentence: '웨이브 4는 앞 그룹을 처치하지 못하고 다음 그룹과 겹친다',
+    measure: '웨이브 4에서 앞 그룹이 남은 상태로 다음 그룹이 등장한 비율(중간 봇)', unit: '%',
     get: function (M) { return M.mid.w4over * 100; },
     range: [50, null], temp: true },
 
   { id: 'R6', name: '근거리형 한 마리는 피할 수 있게', src: 'DT: 대시 쿨타임',
     sentence: '근거리형 한 마리 공격은 매번 피할 수 있게',
-    measure: '숙련 봇이 대시 쿨 중에 근거리형에게 맞은 횟수(판당)', unit: '번',
+    measure: '숙련 봇이 대시 쿨타임 중 근거리형에게 맞은 횟수(플레이 1회당)', unit: '회',
     get: function (M) { return M.skilled.meleeHitDashCd; },
     range: [null, 0.2], temp: true },
 
-  { id: 'R7', name: '평타 쿨감 바닥', src: 'DT: 평타 쿨타임 감소',
-    sentence: '한 판 25장이라 3단계 4장이나 1단계 10장이면 닿을 수 있다',
-    measure: '평타 쿨타임이 바닥에 닿은 판 비율(세 실력 합)', unit: '%',
+  { id: 'R7', name: '평타 쿨타임 감소 한계', src: 'DT: 평타 쿨타임 감소',
+    sentence: '플레이 1회에 카드 25장이라 3단계 4장이나 1단계 10장이면 도달할 수 있다',
+    measure: '평타 쿨타임이 최소값에 도달한 플레이 비율(세 실력 합)', unit: '%',
     get: function (M) { var t = 0, n = 0; ['skilled', 'mid', 'novice'].forEach(function (l) { t += M[l].cdFloor * M[l].n; n += M[l].n; }); return t / n * 100; },
     range: [5, null], temp: true },
 
-  { id: 'R8', name: '카드가 쌓일수록 파훼 시도', src: '시스템 기획 6번',
+  { id: 'R8', name: '카드가 쌓일수록 파훼 시도', src: '시스템 기획',
     sentence: '카드가 쌓일수록 파훼 시도가 늘어나는 게 드러나게',
-    measure: '돌진을 알아차렸을 때 깎으러 붙은 비율, 5층 − 1층(세 실력 중 가장 낮은 값)', unit: '%p',
+    measure: '돌진을 인지했을 때 파훼를 시도한 비율의 5층과 1층 차이(세 실력 중 가장 낮은 값)', unit: '%p',
     get: function (M) {
       var worst = Infinity;
       ['skilled', 'mid', 'novice'].forEach(function (l) {
@@ -68,9 +68,9 @@ G.Dash.RULES = [
     },
     range: [5, null], temp: true },
 
-  { id: 'R10', name: '공격력, 평타 카드 곱하기', src: '시스템 기획 0번',
+  { id: 'R10', name: '공격력, 평타 카드 곱하기', src: '시스템 기획',
     sentence: '공격력, 평타 카드를 같이 모을수록 서로 키워 준다',
-    measure: '둘 다 고른 판의 초당 피해 증가 − (공격력만 증가 + 평타만 증가), 1층 첫 4장 기준(세 실력 중 가장 낮은 값)', unit: '',
+    measure: '둘 다 고른 플레이의 초당 피해 증가 − (공격력만 고른 증가 + 평타만 고른 증가), 1층 첫 카드 4장 기준(세 실력 중 가장 낮은 값)', unit: '',
     get: function (M) {
       var worst = Infinity;
       ['skilled', 'mid', 'novice'].forEach(function (l) {
