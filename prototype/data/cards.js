@@ -1,6 +1,6 @@
 // DT: 카드
 // name: 카드 화면에 크게 나오는 이름(11/22 콘셉트). label: 효과 이름(카드 화면 이름 아래, 대시보드)
-// color: 카드 그림 자리 색 구분(화면용, 규칙엔 안 씀). survive 시안(생존), attack 마젠타(공격), basic 옐로(평타), skill 녹색(스킬). 타디온 11/22
+// color: 카드 그림 자리 색 구분(화면용, 규칙엔 안 씀). survive 시안(생존), attack 마젠타(공격), basic 옐로(평타), skill 녹색(스킬). 이정헌 11/22
 // stat: 플레이어 DT에서 올릴 항목 경로. tiers: 1·2·3단계 증가폭
 // stackable: 중복 가능 여부. requires: 이 조건이 있을 때만 후보로 나옴
 var G = globalThis.G = globalThis.G || {};

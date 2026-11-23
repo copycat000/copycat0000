@@ -10,9 +10,9 @@
   var s = null, cardSel = 0;
   var effects = [];          // 공격 부채꼴처럼 잠깐 보이는 그림(규칙과 무관)
   var EFFECT_LIFE = { skillClear: 0.35, skillHeal: 0.6, swing: 0.14, enemySwing: 0.15, damageNumber: 0.6, deathPuff: 0.25, hitSpark: 0.2, breakBurst: 0.45, wallDust: 0.35 };
-  // 보스 파훼 순간: 평타 히트스톱(H)과 상관없이 항상 멈춤(11/20 타디온: 보스 카운터·파훼 순간에 쓰기로). 임시값
-  var BREAK_HITSTOP = 0.3,  /* 0.15에서 2배, 타디온 확정(11/20): 길게 멈춰야 해냈다는 피드백이 강함 */ SHAKE_BREAK = { time: 0.25, amp: 8 }, SHAKE_WALL = { time: 0.18, amp: 6 };
-  var LOCKMOVE_ON = true;    // 밀리는 동안 조작 불가(타디온 확정 11/20). L로 켜고 끔(비교용)
+  // 보스 파훼 순간: 평타 히트스톱(H)과 상관없이 항상 멈춤(11/20 이정헌: 보스 카운터·파훼 순간에 쓰기로). 임시값
+  var BREAK_HITSTOP = 0.3,  /* 0.15에서 2배, 이정헌 확정(11/20): 길게 멈춰야 해냈다는 피드백이 강함 */ SHAKE_BREAK = { time: 0.25, amp: 8 }, SHAKE_WALL = { time: 0.18, amp: 6 };
+  var LOCKMOVE_ON = true;    // 밀리는 동안 조작 불가(이정헌 확정 11/20). L로 켜고 끔(비교용)
   var SQUASH_TIME = 0.12;    // 맞은 적이 찌그러졌다 돌아오는 시간(초)
 
   // 타격 피드백(그림·시간만, 규칙 계산 결과는 그대로)
@@ -28,8 +28,8 @@
 
   // 입력 미리 받기: 쿨타임이 끝나기 조금 전에 누른 공격·대시를 버리지 않고, 끝나는 순간 나가게 함
   // (전투 시간 기준이라 히트스톱 동안에도 유지). B로 켜고 끔(비교용)
-  var BUFFER_ON = false, BUFFER_TIME = 0.12;  // 기본 꺼짐(11/20 타디온: 꺼진 쪽이 체감이 나음)
-  var HITSTOP_ON = false;                     // 기본 꺼짐(11/20 타디온: 핵슬 느낌이라 평타엔 안 맞음, 보스 카운터·패턴 파훼 같은 순간에 쓸 예정). H로 켜고 끔
+  var BUFFER_ON = false, BUFFER_TIME = 0.12;  // 기본 꺼짐(11/20 이정헌: 꺼진 쪽이 체감이 나음)
+  var HITSTOP_ON = false;                     // 기본 꺼짐(11/20 이정헌: 핵슬 느낌이라 평타엔 안 맞음, 보스 카운터·패턴 파훼 같은 순간에 쓸 예정). H로 켜고 끔
   var KNOCKBACK_ON = true;                    // K로 켜고 끔(비교용). 규칙이 바뀌는 항목
   var bufAttack = -1, bufDash = -1;
   function readButtons() {

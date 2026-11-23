@@ -37,7 +37,7 @@ G.Core.player = {
     G.Core.skills.tick(s, h);
 
     // 맞고 밀려나는 중: 밀리는 거리만큼 움직이고, lockMove면 조작(이동·공격·대시) 전부 무시
-    // 의도(타디온 11/20): 맞으면 끝까지 밀려야 피하든 파훼하든 하라는 압력이 생김
+    // 의도(이정헌 11/20): 맞으면 끝까지 밀려야 피하든 파훼하든 하라는 압력이 생김
     if (p.kbTime > 0) {
       var kt = Math.min(h, p.kbTime);
       p.x += p.kbVx * kt; p.y += p.kbVy * kt;
