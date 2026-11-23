@@ -1,7 +1,7 @@
 // 기획서 의도 검사 규칙. 규칙 하나 = 이름 / 기획서 문장 / 잴 것 / 맞음 범위
 // 사이트용 기획서 페이지가 생기면 sentence를 그 페이지 문장에 붙이고, 이 파일은 거기서 모으는 쪽으로 바꾼다.
 // range: [아래, 위]. null은 끝이 없음. range 자체가 null이면 검사 안 함.
-// temp: true = 임시 범위(맞음범위_후보.md의 A안). 타디온이 정하면 값 바꾸고 temp를 지움
+// temp: true = 임시 범위(맞음범위_후보.md의 A안). 이정헌이 정하면 값 바꾸고 temp를 지움
 // get(M): M = sim.agg 결과(M.skilled / M.mid / M.novice). 잰 값 하나를 돌려줌
 var G = globalThis.G = globalThis.G || {};
 G.Dash = G.Dash || {};
